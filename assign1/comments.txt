@@ -1,1 +1,5 @@
 comments made by one group member to another
+
+zjshen commenting on liyao1's diagram:
+-since cars is a weak entity, car# should be labeled as weak key
+-the attribute 'poster' in booking should be an attribute in request
