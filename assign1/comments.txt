@@ -1,5 +1,15 @@
 comments made by one group member to another
 
+
 zjshen commenting on liyao1's diagram:
 -since cars is a weak entity, car# should be labeled as weak key
 -the attribute 'poster' in booking should be an attribute in request
+
+liyao1 commenting on ER diagram of zjshen:
+Since every ride is offered by a driver, it should be a weak entity which is
+related to drivers, hence offer is a weak relationship.
+Assuming each car is registered by a driver, and each driver is registered with
+a car. Then both of the car registered by driver and driver registering a car
+relationships should be total participation.
+
+liyao1 commenting on ER diagram of :
