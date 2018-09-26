@@ -67,8 +67,8 @@ upc CHAR(11),
 qty INTEGER,
 price DOUBLE,
 PRIMARY KEY (sid, upc), //added primary key
-FOREIGN KEY(sid) REFFRENCES Stores, //no need for on delete cascade
-FOREIGN KEY(upc) REFFRENCES Products); //no need for on delete cascade
+FOREIGN KEY(sid) REFFRENCES Stores, //no need for ON DELETE CASCADE
+FOREIGN KEY(upc) REFFRENCES Products); //no need for ON DELETE CASCADE
 
 CREATE TABLE Incl(
 oid CHAR(11),
@@ -86,3 +86,11 @@ uprice DOUBLE,
 sid CHAR(11),
 upc CHAR(11),
 PRIMARY KEY(lno) REFERENCES Lines);
+
+CREATE TABLE Assoc(
+sid CHAR(11),upc CHAR(11), lno CHAR(11), oid CHAR(11),
+PRIMARY KEY(oid, sid, upc, lno),
+FOREIGN KEY(oid) REFFRENCES Orders ON DELETE CASCADE,
+FOREIGN KEY (sid) REFFERENCES Stores,
+FOREIGN KEY(upc) REFFRENCES Products ON DELETE CASCADE,
+FOREIGN KEY(lno) REFFRENCES Lines ON DELETE CASCADE)
