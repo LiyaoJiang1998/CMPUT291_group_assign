@@ -11,27 +11,27 @@ name CHAR(20),
 address CHAR(50),
 PRIMARY KEY(phone));
 
-CREATE TABLE Reviews_of ( //combined reviewOf and reviews
+CREATE TABLE Reviews_of (
 revId CHAR(11),
 rdate DATE,
 rtext CHAR(100),
-oid CHAR(11) NOT NULL, //added NOT NULL
+oid CHAR(11) NOT NULL,
 PRIMARY KEY(revId),
-FOREIGN KEY(oid) REFFRENCES Orders ON DELETE NO ACTION); //changed to NO ACTION
+FOREIGN KEY(oid) REFFRENCES Orders ON DELETE CASCADE;
 
 CREATE TABLE Orders (
 oid CHAR(11),
 odate DATE,
 del address CHAR(50),
-phone INTEGER NOT NULL, //added NOT NULL
+phone INTEGER NOT NULL,
 PRIMARY KEY(oid),
-FOREIGN KEY(phone) REFFRENCES Customers ON DELETE CASCADE); //not sure if it should be changed to on delete no action
+FOREIGN KEY(phone) REFFRENCES Customers ON DELETE NO ACTION);
 
 CREATE TABLE Deliveries (
 trackingNo INTEGER,
-plate CHAR(11) NOT NULL, //added NOT NULL
+plate CHAR(11) NOT NULL,
 PRIMARY KEY(trackingNo),
-FOREIGN KEY(plate) REFFRENCES Drivers ON DELETE NO ACTION); //changed cascade to no action, because dont want to delete a deliveries because a driver got removed
+FOREIGN KEY(plate) REFFRENCES Drivers ON DELETE NO ACTION);
 
 CREATE TABLE Drivers(
 plate CHAR(11),
@@ -43,22 +43,22 @@ CREATE TABLE Products(
 upc CHAR(11),
 name CHAR(20),
 unit CHAR(20),
-cid CHAR(11) NOT NULL, //added NOT NULL
+cid CHAR(11) NOT NULL,
 PRIMARY KEY(upc),
-FOREIGN KEY(cid) REFFRENCES Categories ON DELETE NO ACTION); //changed cascade to no action because we dont want to delete the product just because it doesnt belong to a category
+FOREIGN KEY(cid) REFFRENCES Categories ON DELETE NO ACTION);
 
 CREATE TABLE Categories(
 cid CHAR(11),
 name CHAR(20),
 PRIMARY KEY(cid));
 
-CREATE TABLE Lines( //tricky table, not sure if right
+CREATE TABLE Lines(
 lno CHAR(11),
-oid CHAR(11) NOT NULL, //added NOT NULL
-sid CHAR(11) NOT NULL, //added sid as foreign key
-upc CHAR(11) NOT NULL, //added upc as foreign key
+oid CHAR(11) NOT NULL,
+sid CHAR(11) NOT NULL,
+upc CHAR(11) NOT NULL,
 PRIMARY KEY(lno, oid),
-FOREIGN KEY (oid) REFERENCES Orders ON DELETE CASCADE
+FOREIGN KEY (oid) REFERENCES Orders ON DELETE CASCADE,
 FOREIGN KEY (sid, upc) REFERENCES (Stores, Products) ON DELETE NO ACTION);
 
 CREATE TABLE Carries(
@@ -66,38 +66,27 @@ sid CHAR(11),
 upc CHAR(11),
 qty INTEGER,
 price DOUBLE,
-PRIMARY KEY (sid, upc), //added primary key
-FOREIGN KEY(sid) REFFRENCES Stores, //no need for ON DELETE CASCADE
-FOREIGN KEY(upc) REFFRENCES Products); //no need for ON DELETE CASCADE
+PRIMARY KEY (sid, upc),
+FOREIGN KEY(sid) REFFRENCES Stores,
+FOREIGN KEY(upc) REFFRENCES Products);
 
 CREATE TABLE Incl(
 oid CHAR(11),
-trackingNo INTEGER NOT NULL, //added NOT NULL
+trackingNo INTEGER NOT NULL,
 pickupTime DATE,
 dropOffTime Date,
-PRIMARY KEY(oid, trackingNo), //added PRIMARY KEY
-FOREIGN KEY(oid) REFFRENCES Orders ON DELETE CASCADE,
-FOREIGN KEY(trackingNo) REFFRENCES Deliveries ON DELETE CASCADE);
+PRIMARY KEY(oid, trackingNo),
+FOREIGN KEY(oid) REFFRENCES Orders,
+FOREIGN KEY(trackingNo) REFFRENCES Deliveries);
 
-CREATE TABLE Assoc( //added this table, not sure if right
-lno CHAR(11),
-qty INTEGER,
-uprice DOUBLE,
+CREATE TABLE Assoc(
 sid CHAR(11),
 upc CHAR(11),
-PRIMARY KEY(lno) REFERENCES Lines);
-
-CREATE TABLE Assoc(
-sid CHAR(11),upc CHAR(11), lno CHAR(11), oid CHAR(11),
+lno CHAR(11),
+oid CHAR(11),
+qty INTEGER,
+uprice DOUBLE,
 PRIMARY KEY(oid, sid, upc, lno),
-FOREIGN KEY(oid) REFFRENCES Orders ON DELETE CASCADE,
-FOREIGN KEY(sid) REFFERENCES Stores ON DELETE CASCADE,
-FOREIGN KEY(upc) REFFRENCES Products ON DELETE CASCADE,
-FOREIGN KEY(lno) REFFRENCES Lines ON DELETE CASCADE)
-
-CREATE TABLE Assoc(
-sid CHAR(11),upc CHAR(11), lno CHAR(11), oid CHAR(11),
-PRIMARY KEY(oid, sid, upc, lno),
-FOREIGN KEY(lno,oid) REFFRENCES Lines ON DELETE CASCADE,
-FOREIGN KEY(sid) REFFERENCES Stores ON DELETE CASCADE,
-FOREIGN KEY(upc) REFFRENCES Products ON DELETE CASCADE,
+FOREIGN KEY(lno,oid) REFFRENCES Lines,
+FOREIGN KEY(sid) REFFERENCES Stores,
+FOREIGN KEY(upc) REFFRENCES Products,
