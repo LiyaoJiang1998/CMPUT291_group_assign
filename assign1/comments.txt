@@ -5,6 +5,12 @@ zjshen commenting on liyao1's diagram:
 -since cars is a weak entity, car# should be labeled as weak key
 -the attribute 'poster' in booking should be an attribute in request
 
+zjshen commenting on hqi's diagram:
+- booking is labeled as a relation but it is connected to two other relations, should change booking to an entity and add book as a relation
+- it would be a good idea to change en-route from attribute to relation
+- good solution to have review as an entity
+- may be lacking constraints in various locations, may need to reconsider requirements and decide what restraints to add 
+
 liyao1 commenting on ER diagram of zjshen:
 - Since every ride is offered by a driver, it should be a weak entity which is
   related to drivers, hence offer is a weak relationship.
