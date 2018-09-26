@@ -18,3 +18,13 @@ liyao1 commenting on ER diagram of hqi:
 - Assuming each car is registered by a driver, and each driver is registered with
   a car. Then both of the car registered by driver and driver registering a car
   relationships should be total participation.
+
+hqi commenting on zjshen's diagram:
+booking and request should not be ISA Hierarchy of ride
+there are lines that crossed each other
+overall, the diagram is neat and clear
+
+hqi commenting on liyao1's diagram:
+booking and request should not be ISA Hierarchy of ride
+a driver may register to multiple cars
+overall, the diagram is neat and shows all the information
