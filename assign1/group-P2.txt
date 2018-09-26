@@ -1,12 +1,74 @@
-CREATE TABLE Stores (sid CHAR(11), name CHAR(20), phone INTEGER, address CHAR(50), PRIMARY KEY (sin));
-CREATE TABLE Customers (phone INTEGER, name CHAR(20), address CHAR(50), PRIMARY KEY(phone));
-CREATE TABLE Reviews (revId CHAR(11), rdate DATE, rtext CHAR(100), oid CHAR(11), PRIMARY KEY(revId), FOREIGN KEY(oid) REFFRENCES Orders ON DELETE CASCADE);
-CREATE TABLE Orders (oid CHAR(11), odate DATE, del address CHAR(50), phone INTEGER PRIMARY KEY(oid), FOREIGN KEY(phone) REFFRENCES Customers ON DELETE CASCADE);
-CREATE TABLE Deliveries (trackingNo INTEGER, plate CHAR(11), PRIMARY KEY(trackingNo) FOREIGN KEY(plate) REFFRENCES Drivers ON DELETE CASCADE);
-CREATE TABLE Drivers(plate CHAR(11), name CHAR(20), phone INTEGER, PRIMARY KEY(plate));
-CREATE TABLE Products(upc CHAR(11), name CHAR(20), unit CHAR(20), cid CHAR(11), PRIMARY KEY(upc), FOREIGN KEY(cid) REFFRENCES Categories ON DELETE CASCADE);
-CREATE TABLE Categories(cid CHAR(11), name CHAR(20), PRIMARY KEY(cid));
-CREATE TABLE Lines(lno CHAR(11), oid CHAR(11), PRIMARY KEY(lno, oid), FOREIGN KEY (oid) REFERENCES Orders ON DELETE CASCADE);
-CREATE TABLE Carries(sid CHAR(11), upc CHAR(11), qty INTEGER, price DOUBLE, FOREIGN KEY(sid) REFFRENCES Stores ON DELETE CASCADE, FOREIGN KEY(upc) REFFRENCES Products ON DELETE CASCADE);
-CREATE TABLE Incl(oid CHAR(11), trackingNo INTEGER, pickupTime DATE, dropOffTime Date, FOREIGN KEY(oid) REFFRENCES Orders ON DELETE CASCADE, FOREIGN KEY(trackingNo) REFFRENCES Deliveries ON DELETE CASCADE
+CREATE TABLE Stores (
+sid CHAR(11),
+name CHAR(20),
+phone INTEGER,
+address CHAR(50),
+PRIMARY KEY (sin));
 
+CREATE TABLE Customers (
+phone INTEGER,
+name CHAR(20),
+address CHAR(50),
+PRIMARY KEY(phone));
+
+CREATE TABLE Reviews (
+revId CHAR(11),
+rdate DATE,
+rtext CHAR(100),
+oid CHAR(11),
+PRIMARY KEY(revId),
+FOREIGN KEY(oid) REFFRENCES Orders ON DELETE CASCADE);
+
+CREATE TABLE Orders (
+oid CHAR(11),
+odate DATE,
+del address CHAR(50),
+phone INTEGER PRIMARY KEY(oid),
+FOREIGN KEY(phone) REFFRENCES Customers ON DELETE CASCADE);
+
+CREATE TABLE Deliveries (
+trackingNo INTEGER,
+plate CHAR(11),
+PRIMARY KEY(trackingNo),
+FOREIGN KEY(plate) REFFRENCES Drivers ON DELETE CASCADE);
+
+CREATE TABLE Drivers(
+plate CHAR(11),
+name CHAR(20),
+phone INTEGER,
+PRIMARY KEY(plate));
+
+CREATE TABLE Products(
+upc CHAR(11),
+name CHAR(20),
+unit CHAR(20),
+cid CHAR(11),
+PRIMARY KEY(upc),
+FOREIGN KEY(cid) REFFRENCES Categories ON DELETE CASCADE);
+
+CREATE TABLE Categories(
+cid CHAR(11),
+name CHAR(20),
+PRIMARY KEY(cid));
+
+CREATE TABLE Lines(
+lno CHAR(11),
+oid CHAR(11),
+PRIMARY KEY(lno, oid),
+FOREIGN KEY (oid) REFERENCES Orders ON DELETE CASCADE);
+
+CREATE TABLE Carries(
+sid CHAR(11),
+upc CHAR(11),
+qty INTEGER,
+price DOUBLE,
+FOREIGN KEY(sid) REFFRENCES Stores ON DELETE CASCADE,
+FOREIGN KEY(upc) REFFRENCES Products ON DELETE CASCADE);
+
+CREATE TABLE Incl(
+oid CHAR(11),
+trackingNo INTEGER,
+pickupTime DATE,
+dropOffTime Date,
+FOREIGN KEY(oid) REFFRENCES Orders ON DELETE CASCADE,
+FOREIGN KEY(trackingNo) REFFRENCES Deliveries ON DELETE CASCADE);
