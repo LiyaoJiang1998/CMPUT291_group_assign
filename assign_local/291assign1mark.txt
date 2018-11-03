@@ -1,0 +1,137 @@
+﻿CMPUT291 - Fall 2018- Marking of Assignment 1
+
+
+CCID of group members: 
+
+Name: Zhijie Shen CCID: zjshen
+Name: Liyao Jiang CCID: liyao1
+Name: Hongru Qi CCID:hqi
+
+
+TA Name: Victoria Hessdorfer
+
+Part I - Modeling 
+
+
+Group solution
+
+
+Entity Sets and necessary attributes (-1 for each missing attribute, -2 if missing a key where needed)
+
+_____/2 bookings (bno, seats, cost)
+_____/3 rides (rno, price, rdate, seats, lugDesc)
+1/2 locations (lcode, address, prov, city)
+	bad primary key
+_____/2 members (email, name, phone)
+1/2 drivers (licNo)
+	ISA doesnt need primary key
+_____/3 cars (cno, make, model, year, seats)
+1/2 reviews (rid, rdate, rtext, rscore)
+	modelled as two seperate rels?
+
+
+Total: 13/16
+
+
+Relationships and constraints (-1 for each necessary attribute that is missing, -1 for each missing constraint)
+
+
+1/4 Each review must be written by a reviewer member, and have a reviewee member. 
+1/2 A review may have an associated ride. 
+2.5/3 Each car must be registered to a driver, with an associated registration date. 
+0/2 A ride may be associated with a car.
+_____/3 Each ride must be offered by a driver.
+_____/2 Members can also be drivers. 
+_____/2 A ride can have multiple enroute locations. 
+_____/3 Each ride must have a source location and a destination location.
+_____/3 Each booking must be associated to a ride.
+_____/3 Each booking may have a drop off location and a pickup location. 
+_____/3 Each booking must be reserved by a member.
+3/4 Members can post ride requests, and each request has a date, a dollar 
+	amount, pickup and drop-off locations.
+		doesn't need to be its own entity
+
+
+Total: 26.5/34
+
+
+
+
+Notional or Conceptual Deductions (deduct for each instance up to the third)
+
+
+_____ There are extra entities or relationships [-2]
+_____ Redundant attributes [-1]
+_____ If an attribute is connected to more than one entity or relationship  [-1]
+_____ If a relationship does not connect two entities [-2]
+_____ If two entities are directly connected without using a relationship  [-2]
+_____ If there is an arrow from a relationship toward an entity [-1]
+_____ Other (explain):
+
+
+39.5/50 Group mark for Part I
+
+
+
+
+Individual solution (Mark as zero for those with no partners)
+
+
+4/4 Individual ER solution for Part I appears to be complete (most concepts are modeled with 
+        entities and relationships)
+4/4 Proper comments are provided (where needed)
+
+
+47.5/58 Total mark for Part I
+
+
+
+
+
+
+
+
+Part II -- Mapping (-1.0 for missing/incorrect PK or FK, -1.0 for missing "ON DELETE" clause when necessary, -0.5 for each missing attribute)
+
+
+
+
+Entity Sets and relationship sets
+
+
+___/3 stores
+___/3 categories
+___/4 products
+___/4 carries
+___/2 customers
+___/4 orders
+___/4 reviews
+4/6 lines
+	Lines/Assoc - broken up into two tables?
+___/3 drivers
+___/4 deliveries
+___/5 includes
+
+
+
+
+General deductions (deduct for each instance up to the third)
+
+
+___ Redundant tables [-2]
+___ Redundant attributes [-1]
+___ Others (explain):
+
+
+40/42 Part II 
+
+
+Other general deductions
+
+
+___ the readme.txt file is missing, or does not have members names or the statement about collaboration [-2]
+___ the ER is done all in hand-drawing, or the mapping part is not typed [-5]
+___ Late penalty (if applicable) [-10 for one day late, -20 for two days late]
+
+
+87.5/100 TOTAL
