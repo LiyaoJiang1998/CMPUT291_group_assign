@@ -22,6 +22,10 @@ proper message should be sent to the other member that s/he is booked on the rid
 
 import sqlite3
 
+def addBooking():
+    # TODO:
+    pass
+
 def listAllRides(conn, email):
     '''
     list all the rides the member offers with # of available seats
