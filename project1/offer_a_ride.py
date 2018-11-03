@@ -7,29 +7,45 @@ cur = None
 result = None
 driver = None
 
+
 #get source location
-def getSource():
-    global conn, cur
+def getSource(conn):
     keyword = input('input source location keyword: ')
 
-    return displayAndSelect(locationSearch(keyword, cur), 0)
+    return displayAndSelect(locationSearch(keyword, conn), 0)
 
 #get destination
-def getDestination():
-    global conn, cur
+def getDestination(conn):
     keyword = input('input destination location keyword: ')
 
-    return displayAndSelect(locationSearch(keyword, cur), 0)
+    return displayAndSelect(locationSearch(keyword, conn), 0)
 
 #get car number
-def getCarNo():
-
-    return
+#returns '' if left blank, '-1' if invalid, int of carNo if valid
+def getCarNo(email, conn):
+    carNo = input('input car number(optional): ')
+    if carNo == '':
+        return carNo
+    if not re.match('[0-9]+', carNo):
+        return '-1'
+    if carValid(int(carNo), email, conn):
+        return carNo 
+    else: 
+        return '-1'
+    
 
 #get enroute
-def getEnroute():
-
-    return
+def getEnroute(conn):
+    result = set()
+    while 1:
+        keyword = input('input enroute locations one at a time(optional): ')
+        if keyword == '':
+            break
+        lcode = displayAndSelect(locationSearch(keyword, conn), 0)
+        if lcode is not '':
+            result.add(lcode)
+    
+    return result
 
 #find location
 
@@ -42,17 +58,17 @@ def checkValid(result):
         return False
 
     #match date, format 'YYYY-MM-DD'
-    if (re.match('[1-9][0-9]{3}-(0[1-9]|1[0-2])-[0-9]{2}', result[0]) == None):
+    if (re.match('[1-9][0-9]{3}-(0[1-9]|1[0-2])-[0-9]{2}', result[1]) == None):
         print('invalid date')
         return False
 
     #match seats
-    if (re.match('[1-9][0-9]*', result[1]) == None):
+    if (re.match('[1-9][0-9]*', result[2]) == None):
         print('invalid seats')
         return False
 
     #match price per seat
-    if (re.match('[1-9][0-9]*', result[2]) == None):
+    if (re.match('[1-9][0-9]*', result[0]) == None):
         print('invalid seats')
         return False
 
@@ -67,12 +83,12 @@ def checkValid(result):
 
 #get user input
 #requires user email
-def postOffer(email):
+def postOffer(email, conn):
     #global result
     #prompt user input
     print('Input ride offer in the following format')
     print('(quit) to exit offer posting')
-    print("(date, number of seats offered, price per seat, luggage description)")
+    print("(price per seat, date, number of seats offered, luggage description)")
         
     while(1):
         info = input('ride offer: ')
@@ -82,30 +98,54 @@ def postOffer(email):
         if (not checkValid(info)):
             continue
         
+        #type casting to make sure seats and price are int
+        info[0] = int(info[0])
+        info[2] = int(info[2])
+
         #get sourcelocation
-        source = getSource()
+        source = getSource(conn)
         if source == '': 
             print('no source location input, try again')
             continue
         info += [source]
 
         #get destination
-        destination = getDestination()
+        destination = getDestination(conn)
         if destination == '': 
             print('no destination location input, try again')
             continue
         info += [destination]
-
+        
         #get carnumber
-        print('input car number(optional)')
-        getCarNo()
+        carNo = getCarNo(email, conn)
+        if carNo == '-1':
+            print('invalid input')
+            continue 
+        elif carNo is not '':
+            carNo = int(carNo)
+        else: 
+            carNo = None
+        
+        info += [email]
+        info += [carNo]
+
 
         #get enroute
-        print('input enroute locations(optional)')
-        getEnroute()
+        enroute = getEnroute(conn)
 
-        print(info)
-        
+        #print(info)
+        #print(enroute)
+
+        break
+    rno = getUniqueRno(conn)
+    final = tuple([rno] + info)
+    insertRide(final, conn)
+    insertEnroute(rno, enroute, conn)
+
+    #ride and enroute has been inserted, commit change to db
+    conn.commit()
+    #print(final)
+    print('ride is posted')
         
 
 def main():
@@ -115,7 +155,8 @@ def main():
     conn = sqlite3.connect(path)
     cur = conn.cursor()
     email = 'joe@gmail.com'
-    postOffer(email)
+    postOffer(email, conn)
+    #conn.commit()
     conn.close()
 
 
