@@ -22,8 +22,6 @@ proper message should be sent to the other member that s/he is booked on the rid
 
 import sqlite3
 
-# conn = sqlite3.connect('./project1.db')
-
 def listAllRides(conn, c, email):
     '''
     list all the rides the member offers with # of available seats
@@ -48,30 +46,114 @@ def listAllRides(conn, c, email):
         select rno, driver, available
         from ride_info
         where driver = ? ;
-        ''', email)
-    c.commit()
+        ''', (email,))
+    conn.commit()
+
+    print("All the rides provided: ")
+    names = tuple(map(lambda x: x[0], c.description))
+    print(names)
 
     ridesRows = c.fetchall()
     if len(ridesRows) > 5:
-        print(ridesRows[:5])
+        for e in ridesRows[:5]:
+            print(e)
         for i in range(5,len(ridesRows),5):
             answer = input('Enter y to see more, otherwise finish')
             if answer == 'y':
-                print(ridesRows[i:i+5])
+                for e in ridesRows[i:i+5]:
+                    print(e)
             else:
                 break
     elif len(ridesRows) == 0:
         print('no ride offered found')
     else:
-        print(ridesRows)
+        for e in ridesRows:
+            print(e)
 
 def listAllBooking(conn, c, email):
     '''
     list all bookings on rides s/he offers and cancel any booking.
     '''
     c.execute('''
-        select b.rno, b.bno
+        select b.bno, b.email, b.rno, b.cost, b.seats, b.pickup, b.dropoff
         from bookings b, rides r
-        where b.rno = r.rno and b.email = ? and  
-        ''', email)
-    c.commit()
+        where b.rno = r.rno and r.driver = ?;
+        ''', (email,))
+    conn.commit()
+
+    print("All the rides provided: ")
+    names = tuple(map(lambda x: x[0], c.description))
+    print(names)
+
+    bookingsRows = c.fetchall()
+    for e in bookingsRows:
+        print(e)
+
+def cancelBooking(conn, c, email):
+    while True:
+        bno = input('please enter the bno for the booking you need to cancel: ')
+        # save the user who booked that ride:
+        c.execute('''
+            select email
+            from bookings
+            where bno = ?
+            ''',(bno,))
+        receiver = c.fetchone()
+        if receiver == None:
+            print('invalid bno!!')
+            choice = input('Enter y to try enter the bno again, else quit canceling: ')
+            if choice == 'y' or choice == 'Y':
+                continue
+            else:
+                return
+        else:
+            c.execute('''
+                select r.driver, r.rno
+                from bookings b, rides r
+                where b.bno = ? and b.rno = r.rno
+                ''',(bno,))
+            (provider,ridenum) = c.fetchone()
+            if provider == email:
+                break
+            else:
+                print('you did not provide this ride!')
+                choice = input('Enter y to try enter the bno again, else quit canceling: ')
+                if choice == 'y' or choice == 'Y':
+                    continue
+                else:
+                    return
+
+    # delete the booking row
+    c.execute('''
+        delete
+        from bookings
+        where bookings.bno = ?
+        and bookings.rno in (
+            select r.rno
+            from rides r
+            where r.driver = ?
+        );
+        ''',(bno,email))
+
+    # TODO: send massage to the user (receiver) who booked the canceled ride
+    receiver = receiver[0]
+    # send the proper message
+    content = 'sorry, your booking bno: %s, is canceled by the driver'%(bno)
+    c.execute('''
+        insert into inbox
+        values (?,datetime('now'),?,?,?,?);
+        ''',(receiver,email,content,ridenum,'n'))
+        
+    conn.commit()
+
+
+if __name__ == '__main__':
+    conn = sqlite3.connect('./project1.db')
+    c = conn.cursor()
+
+    # email = 'whatever@e.com' # test listAllRides
+    # listAllRides(conn, c ,email)
+
+    email = 'joe@gmail.com' # test listAllBooking
+    listAllBooking(conn, c ,email)
+    cancelBooking(conn, c, email)
