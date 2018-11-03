@@ -1,29 +1,6 @@
-'''
-Book members or cancel bookings.The member should be able to list all bookings
-on rides s/he offers and cancel any booking. For any booking that is cancelled
-(i.e. being deleted from the booking table), a proper message should be sent to
-the member whose booking is cancelled. Also the member should be able to book
-other members on the rides they offer.
-
-Your system should list all rides the
-member offers with the number of available seats for each ride (i.e., seats that
- are not booked). If there are more than 5 matching rides, at most 5 will be
-shown at a time, and the member will have the option to see more.
-
-The member
-should be able to select a ride and book a member for that ride by entering the
-member email, the number of seats booked, the cost per seat, and pickup and drop
- off location codes. Your system should assign a unique booking number (bno) to
-the booking. Your system should give a warning if a ride is being overbooked
-(i.e. the number of seats booked exceeds the number of seats offered), but will
-allow overbooking if the member confirms it. After a successful booking, a
-proper message should be sent to the other member that s/he is booked on the ride.
-'''
-
 import sqlite3
 
 def addBooking(conn, email):
-    # TODO:
     c = conn.cursor();
     # validate if the driver provided the given rno
     while True:
@@ -135,29 +112,65 @@ def addBooking(conn, email):
 
     # input the pickup lcode
     while True:
-        plcode = input('Please enter the pickup location lcode')
-        try:
-            bCost = int(bCost)
-            if bCost < 0:
-                print('invalid cost')
-                choice = input('Enter y to try enter the cost again, else quit booking: ')
-                if choice == 'y' or choice == 'Y':
-                    continue
-                else:
-                    return
-            else:
-                break
-
-        except ValueError as e:
-            print('invalid cost')
-            choice = input('Enter y to try enter the cost again, else quit booking: ')
+        plcode = input('Please enter the pickup location lcode: ')
+        c.execute('''
+            select lcode
+            from locations
+            ''')
+        allLcode = [lcode for subtuples in c.fetchall() for lcode in subtuples]
+        if plcode in allLcode:
+            break
+        else:
+            print('this lcode does not exist!')
+            choice = input('Enter y to try enter the lcode again, else quit booking: ')
             if choice == 'y' or choice == 'Y':
                 continue
             else:
                 return
 
+    # input the dropoff lcode
+    while True:
+        dlcode = input('Please eneter the dropoff location lcode: ')
+        c.execute('''
+            select lcode
+            from locations
+            ''')
+        allLcode = [lcode for subtuples in c.fetchall() for lcode in subtuples]
+        if dlcode in allLcode:
+            break
+        else:
+            print('this lcode does not exist!')
+            choice = input('Enter y to try enter the lcode again, else quit booking: ')
+            if choice == 'y' or choice == 'Y':
+                continue
+            else:
+                return
 
-    # dlcode = input('Please eneter the dropoff location lcode')
+    # generate a unique bno
+    c.execute('''
+        select max(bno)
+        from bookings;
+        ''')
+    bno = c.fetchone()
+    if bno == None:
+        bno = 1
+    else:
+        bno = bno[0] + 1
+
+    # now insert the information into bookings
+    # bno,email,rno,cost,seats,pickup,dropoff
+    c.execute('''
+        insert into bookings
+        values (?,?,?,?,?,?,?);
+        ''',(bno,who,rno,bCost,numSeat,plcode,dlcode))
+    # send the proper message
+    receiver = who
+    content = 'you are booked on the ride: %s, the bno is: %s'%(rno,bno)
+    c.execute('''
+        insert into inbox
+        values (?,datetime('now','localtime'),?,?,?,?);
+        ''',(receiver,email,content,rno,'n'))
+    conn.commit()
 
 def listAllRides(conn, email):
     '''
@@ -175,7 +188,7 @@ def listAllRides(conn, email):
              r.rdate, r.price, ls.city, ld.city
         from rides r left outer join bookings b on b.rno = r.rno, locations ls, locations ld
         where ls.lcode = r.src and ld.lcode = r.dst
-        and r.rdate > datetime('now')
+        and r.rdate > datetime('now','localtime')
         group by r.driver, r.rno, r.seats, r.rdate, r.price, ls.city, ld.city;
         ''')
     # fetch the rides provided by this membber
@@ -275,13 +288,13 @@ def cancelBooking(conn, email):
         );
         ''',(bno,email))
 
-    # TODO: send massage to the user (receiver) who booked the canceled ride
+    # send massage to the user (receiver) who booked the canceled ride
     receiver = receiver[0]
     # send the proper message
     content = 'sorry, your booking bno: %s, is canceled by the driver'%(bno)
     c.execute('''
         insert into inbox
-        values (?,datetime('now'),?,?,?,?);
+        values (?,datetime('now','localtime'),?,?,?,?);
         ''',(receiver,email,content,ridenum,'n'))
 
     conn.commit()
@@ -294,6 +307,6 @@ if __name__ == '__main__':
     # listAllBooking(conn, email)
     # cancelBooking(conn, email)
 
-    email = 'whatever@e.com' # test listAllRides
-    listAllRides(conn, email)
-    addBooking(conn, email)
+    # email = 'whatever@e.com' # test listAllRides
+    # listAllRides(conn, email)
+    # addBooking(conn, email)
