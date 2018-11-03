@@ -22,11 +22,11 @@ proper message should be sent to the other member that s/he is booked on the rid
 
 import sqlite3
 
-def listAllRides(conn, c, email):
+def listAllRides(conn, email):
     '''
     list all the rides the member offers with # of available seats
     '''
-
+    c = conn.cursor();
     # create a view about each ride
     c.execute('''
         drop view if exists ride_info;
@@ -70,10 +70,12 @@ def listAllRides(conn, c, email):
         for e in ridesRows:
             print(e)
 
-def listAllBooking(conn, c, email):
+def listAllBooking(conn, email):
     '''
     list all bookings on rides s/he offers and cancel any booking.
     '''
+    c = conn.cursor();
+
     c.execute('''
         select b.bno, b.email, b.rno, b.cost, b.seats, b.pickup, b.dropoff
         from bookings b, rides r
@@ -89,7 +91,8 @@ def listAllBooking(conn, c, email):
     for e in bookingsRows:
         print(e)
 
-def cancelBooking(conn, c, email):
+def cancelBooking(conn, email):
+    c = conn.cursor();
     while True:
         bno = input('please enter the bno for the booking you need to cancel: ')
         # save the user who booked that ride:
@@ -143,17 +146,16 @@ def cancelBooking(conn, c, email):
         insert into inbox
         values (?,datetime('now'),?,?,?,?);
         ''',(receiver,email,content,ridenum,'n'))
-        
+
     conn.commit()
 
 
 if __name__ == '__main__':
     conn = sqlite3.connect('./project1.db')
-    c = conn.cursor()
 
     # email = 'whatever@e.com' # test listAllRides
-    # listAllRides(conn, c ,email)
+    # listAllRides(conn, email)
 
     email = 'joe@gmail.com' # test listAllBooking
-    listAllBooking(conn, c ,email)
-    cancelBooking(conn, c, email)
+    listAllBooking(conn, email)
+    cancelBooking(conn, email)
