@@ -9,7 +9,9 @@ driver = None
 
 #get source location
 def getSource():
-    findLocation.findLocation('key')
+    keyword = input('source location keyword:')
+    findLocation.displayAndSelect(locationSearch(keyword), 0)
+    
     return
 
 #get destination
@@ -77,7 +79,6 @@ def getOffer():
             continue
         
         #get sourcelocation
-        print('input source location keyword')
         getSource()
 
         #get destination
