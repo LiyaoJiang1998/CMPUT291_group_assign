@@ -22,9 +22,142 @@ proper message should be sent to the other member that s/he is booked on the rid
 
 import sqlite3
 
-def addBooking():
+def addBooking(conn, email):
     # TODO:
-    pass
+    c = conn.cursor();
+    # validate if the driver provided the given rno
+    while True:
+        rno = input('please enter the rno for the ride you want to book a member : ')
+        # save the user who booked that ride:
+        c.execute('''
+            select driver
+            from rides
+            where rno = ?
+            ''',(rno,))
+        driver = c.fetchone()
+        if driver == None:
+            print('invalid rno!!')
+            choice = input('Enter y to try enter the rno again, else quit booking: ')
+            if choice == 'y' or choice == 'Y':
+                continue
+            else:
+                return
+        else:
+            if driver[0] == email:
+                break
+            else:
+                print('you did not provide this ride!')
+                choice = input('Enter y to try enter the rno again, else quit booking: ')
+                if choice == 'y' or choice == 'Y':
+                    continue
+                else:
+                    return
+
+    # input member email
+    while True:
+        who = input('Please input who (email) you want to book for this ride: ')
+        c.execute('''
+            select email
+            from members
+            ''')
+        allEmail = [email for subtuples in c.fetchall() for email in subtuples]
+        if who in allEmail:
+            break
+        else:
+            print('this member email does not exist!')
+            choice = input('Enter y to try enter the email again, else quit booking: ')
+            if choice == 'y' or choice == 'Y':
+                continue
+            else:
+                return
+
+    # input number of seat
+    while True:
+        # how many seats are available?
+        c.execute('''
+            select available
+            from ride_info
+            where rno = ?
+            ''',(rno,))
+        availableSeats = c.fetchone()[0]
+
+        numSeat = input('Enter the number of seats that you want to book: ')
+        try:
+            numSeat = int(numSeat)
+        except ValueError as e:
+            print('invalid number')
+            choice = input('Enter y to try enter the number again, else quit booking: ')
+            if choice == 'y' or choice == 'Y':
+                continue
+            else:
+                return
+
+        if numSeat <= 0:
+            print('invalid number')
+            choice = input('Enter y to try enter the number again, else quit booking: ')
+            if choice == 'y' or choice == 'Y':
+                continue
+            else:
+                return
+
+        elif numSeat > availableSeats:
+            print('available seats are not enough, you are over booking!')
+            choice = input('Enter y if you are sure, else quit booking: ')
+            if choice == 'y' or choice == 'Y':
+                break
+            else:
+                return
+        else:
+            break
+
+    # input the cost per seat
+    while True:
+        bCost = input('Please enter the cost per seat: ')
+        try:
+            bCost = int(bCost)
+            if bCost < 0:
+                print('invalid cost')
+                choice = input('Enter y to try enter the cost again, else quit booking: ')
+                if choice == 'y' or choice == 'Y':
+                    continue
+                else:
+                    return
+            else:
+                break
+
+        except ValueError as e:
+            print('invalid cost')
+            choice = input('Enter y to try enter the cost again, else quit booking: ')
+            if choice == 'y' or choice == 'Y':
+                continue
+            else:
+                return
+
+    # input the pickup lcode
+    while True:
+        plcode = input('Please enter the pickup location lcode')
+        try:
+            bCost = int(bCost)
+            if bCost < 0:
+                print('invalid cost')
+                choice = input('Enter y to try enter the cost again, else quit booking: ')
+                if choice == 'y' or choice == 'Y':
+                    continue
+                else:
+                    return
+            else:
+                break
+
+        except ValueError as e:
+            print('invalid cost')
+            choice = input('Enter y to try enter the cost again, else quit booking: ')
+            if choice == 'y' or choice == 'Y':
+                continue
+            else:
+                return
+
+
+    # dlcode = input('Please eneter the dropoff location lcode')
 
 def listAllRides(conn, email):
     '''
@@ -62,8 +195,8 @@ def listAllRides(conn, email):
         for e in ridesRows[:5]:
             print(e)
         for i in range(5,len(ridesRows),5):
-            answer = input('Enter y to see more, otherwise finish')
-            if answer == 'y':
+            answer = input('Enter y to see more, otherwise finish: ')
+            if answer == 'y' or answer == 'Y':
                 for e in ridesRows[i:i+5]:
                     print(e)
             else:
@@ -157,9 +290,10 @@ def cancelBooking(conn, email):
 if __name__ == '__main__':
     conn = sqlite3.connect('./project1.db')
 
-    # email = 'whatever@e.com' # test listAllRides
-    # listAllRides(conn, email)
+    # email = 'joe@gmail.com' # test listAllBooking
+    # listAllBooking(conn, email)
+    # cancelBooking(conn, email)
 
-    email = 'joe@gmail.com' # test listAllBooking
-    listAllBooking(conn, email)
-    cancelBooking(conn, email)
+    email = 'whatever@e.com' # test listAllRides
+    listAllRides(conn, email)
+    addBooking(conn, email)
