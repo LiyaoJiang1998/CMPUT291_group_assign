@@ -7,10 +7,11 @@ result = None
 driver = None
 
 #function to find locations based on keyword
-def locationSearch(keyword):
-    global conn, cur
+#requires a cursor input
+def locationSearch(keyword, cur):
+    #global conn, cur
+    
     #find 
-    result = ''
     findLoc = '''
                 SELECT *
                 FROM locations
@@ -59,7 +60,6 @@ def displayAndSelect(results, infoIndex):
                 continue
             else: break
                 
-    
     return results[i+int(selection)-1][infoIndex]
 
     #display search results
@@ -80,7 +80,7 @@ def main():
     conn = sqlite3.connect(path)
     cur = conn.cursor()
     keyword = input('keyword: ')
-    result = displayAndSelect(locationSearch(keyword), 0)
+    result = displayAndSelect(locationSearch(keyword, cur), 0)
     print(result)
     conn.close()
 

@@ -1,6 +1,6 @@
 import sqlite3
 import re
-import queries
+from queries import *
 
 conn = None
 cur = None
@@ -9,15 +9,17 @@ driver = None
 
 #get source location
 def getSource():
-    keyword = input('source location keyword:')
-    findLocation.displayAndSelect(locationSearch(keyword), 0)
-    
-    return
+    global conn, cur
+    keyword = input('input source location keyword: ')
+
+    return displayAndSelect(locationSearch(keyword, cur), 0)
 
 #get destination
 def getDestination():
+    global conn, cur
+    keyword = input('input destination location keyword: ')
 
-    return
+    return displayAndSelect(locationSearch(keyword, cur), 0)
 
 #get car number
 def getCarNo():
@@ -64,7 +66,9 @@ def checkValid(result):
     
 
 #get user input
-def getOffer():
+#requires user email
+def postOffer(email):
+    #global result
     #prompt user input
     print('Input ride offer in the following format')
     print('(quit) to exit offer posting')
@@ -74,16 +78,23 @@ def getOffer():
         info = input('ride offer: ')
         if (re.match("^\\(quit\\)$", info)):
             return
-        
-        if (not checkValid(info[1:-1].split(', '))):
+        info = info[1:-1].split(', ')
+        if (not checkValid(info)):
             continue
         
         #get sourcelocation
-        getSource()
+        source = getSource()
+        if source == '': 
+            print('no source location input, try again')
+            continue
+        info += [source]
 
         #get destination
-        print('input destination location keyword')
-        getDestination()
+        destination = getDestination()
+        if destination == '': 
+            print('no destination location input, try again')
+            continue
+        info += [destination]
 
         #get carnumber
         print('input car number(optional)')
@@ -92,6 +103,8 @@ def getOffer():
         #get enroute
         print('input enroute locations(optional)')
         getEnroute()
+
+        print(info)
         
         
 
@@ -101,7 +114,8 @@ def main():
     path = "./test.db"
     conn = sqlite3.connect(path)
     cur = conn.cursor()
-    getOffer()
+    email = 'joe@gmail.com'
+    postOffer(email)
     conn.close()
 
 
