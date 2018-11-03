@@ -8,9 +8,9 @@ driver = None
 
 #function to find locations based on keyword
 #requires a cursor input
-def locationSearch(keyword, cur):
+def locationSearch(keyword, conn):
     #global conn, cur
-    
+    cur = conn.cursor()
     #find 
     findLoc = '''
                 SELECT *
