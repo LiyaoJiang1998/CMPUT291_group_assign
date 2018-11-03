@@ -1,6 +1,6 @@
 import sqlite3
 import re
-import findLocation
+import queries
 
 conn = None
 cur = None
