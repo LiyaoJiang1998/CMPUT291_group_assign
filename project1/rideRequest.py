@@ -12,8 +12,13 @@ def userSearch(conn, email):
 # delete request
 def delete(conn, rid, email):
     c = conn.cursor()
-    c.execute('DELETE from requests where rid=? and email=?;', (rid,email))
-    conn.commit()
+    c.execute('SELECT * from requests where rid=? and email=?;', (rid, email))
+    request = c.fetchone()
+    if request is None:
+        print("the request is not posted by you and you cannot delete it")
+    else:
+        c.execute('DELETE from requests where rid=? and email=?;', (rid,email))
+        conn.commit()
 
 # search requests by lcode
 def searchByLcode(conn, email, lcode):
