@@ -77,8 +77,15 @@ def carValid(carNo, email, conn):
         return False
 
 
-#function to find locations based on keyword
-#requires a cursor input
+'''
+a function to find locations based on keyword
+inputs:
+    keyword: a keyword to base the search on
+    conn: connection to the database
+
+output:
+    list of tuples that comes from the search
+'''
 def locationSearch(keyword, conn):
     #global conn, cur
     cur = conn.cursor()
