@@ -11,7 +11,7 @@ driver = None
 def locationSearch(keyword, conn):
     #global conn, cur
     cur = conn.cursor()
-    #find 
+    #find
     findLoc = '''
                 SELECT *
                 FROM locations
@@ -45,7 +45,7 @@ def displayAndSelect(results, infoIndex):
                 if re.match('^[1-{0}]$'.format(len(results)-i), selection):
                     break
                 print('invalid selection')
-        
+
         else:
             for j in range(i, i+5):
                 print(results[j])
@@ -59,7 +59,7 @@ def displayAndSelect(results, infoIndex):
             if selection == 'y':
                 continue
             else: break
-                
+
     return results[i+int(selection)-1][infoIndex]
 
     #display search results
