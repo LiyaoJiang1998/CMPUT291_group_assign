@@ -3,8 +3,6 @@ import re
 
 conn = None
 cur = None
-result = None
-driver = None
 
 '''
 insert enroute
@@ -113,6 +111,7 @@ def displayAndSelect(results, infoIndex):
     if len(results) == 0:
         print('no results found')
         return ''
+    print('lcode' + '  |  ' + 'city' + '  |  ' + 'prov' + '  |  ' + 'address')
     #print
     for i in range(0, len(results), 5):
         if len(results) <= i+5:

@@ -2,12 +2,6 @@ import sqlite3
 import re
 from queries import *
 
-conn = None
-cur = None
-result = None
-driver = None
-
-
 #get source location
 def getSource(conn):
     keyword = input('input source location keyword: ')
@@ -88,7 +82,7 @@ def postOffer(email, conn):
     #prompt user input
     print('Input ride offer in the following format')
     print('(quit) to exit offer posting')
-    print("(price per seat, date, number of seats offered, luggage description)")
+    print("(price per seat(no decimal), date(YYYY-MM-DD), number of seats offered, luggage description)")
         
     while(1):
         info = input('ride offer: ')
@@ -154,7 +148,6 @@ def postOffer(email, conn):
 
 def main():
     #assert(type(conn) == sqlite3.Connection)
-    global conn, cur, result
     path = "./test.db"
     conn = sqlite3.connect(path)
     cur = conn.cursor()
