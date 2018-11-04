@@ -4,13 +4,17 @@ from queries import *
 
 #get source location
 def getSource(conn):
-    keyword = input('input source location keyword: ')
+    keyword = input('input source location keyword(q to quit): ')
+    if keyword == 'q':
+        return 'q'
 
     return displayAndSelect(locationSearch(keyword, conn), 0)
 
 #get destination
 def getDestination(conn):
     keyword = input('input destination location keyword: ')
+    if keyword == 'q':
+        return 'q'
 
     return displayAndSelect(locationSearch(keyword, conn), 0)
 
@@ -24,8 +28,8 @@ def getCarNo(email, conn):
         return '-1'
     if carValid(int(carNo), email, conn):
         return carNo 
-    else: 
-        return '-1'
+    else: #car doesnt belong to user
+        return '-2'
     
 
 #get enroute
@@ -81,12 +85,11 @@ def postOffer(email, conn):
     #global result
     #prompt user input
     print('Input ride offer in the following format')
-    print('(quit) to exit offer posting')
     print("(price per seat(no decimal), date(YYYY-MM-DD), number of seats offered, luggage description)")
         
     while(1):
-        info = input('ride offer: ')
-        if (re.match("^\\(quit\\)$", info)):
+        info = input('ride offer, q to exit: ')
+        if (re.match("^q$", info)):
             return
         info = info[1:-1].split(', ')
         if (not checkValid(info)):
@@ -97,25 +100,38 @@ def postOffer(email, conn):
         info[2] = int(info[2])
 
         #get sourcelocation
-        source = getSource(conn)
-        if source == '': 
-            print('no source location input, try again')
-            continue
+        while 1:
+            source = getSource(conn)
+            if source == '': 
+                print('no source location input, try again')
+            else: 
+                break
+        if source == 'q':
+            continue 
         info += [source]
 
         #get destination
-        destination = getDestination(conn)
-        if destination == '': 
-            print('no destination location input, try again')
+        while 1:
+            destination = getDestination(conn)
+            if destination == '': 
+                print('no destination location input, try again')
+            else:
+                break 
+        if destination == 'q':
             continue
         info += [destination]
         
         #get carnumber
-        carNo = getCarNo(email, conn)
-        if carNo == '-1':
-            print('invalid input')
-            continue 
-        elif carNo is not '':
+        while 1:
+            carNo = getCarNo(email, conn)
+            if carNo == '-1':
+                print('invalid input')
+            if carNo == '-2':
+                print('this car does not belong to you, try again')
+            else:
+                break 
+        
+        if carNo is not '':
             carNo = int(carNo)
         else: 
             carNo = None

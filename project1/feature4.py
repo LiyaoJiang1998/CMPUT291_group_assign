@@ -1,13 +1,14 @@
 import sqlite3
 import datetime
-'''
-Post ride requests.The member should be able to post a ride request by providing
-a date, a pick up location code, a drop off location code, and the amount
-willing to pay per seat. The request rid is set by your system to a unique
-number and the email is set to the email address of the member.
-'''
+
 
 def feature4(conn, email):
+    '''
+    Post ride requests.The member should be able to post a ride request by
+    providing a date, a pick up location code, a drop off location code, and
+    the amount willing to pay per seat. The request rid is set by your system
+    to a unique number and the email is set to the email address of the member.
+    '''
     # rid, email, date, pickup lcode, dropoff lcode, amount
     c = conn.cursor()
 
@@ -21,6 +22,7 @@ def feature4(conn, email):
     # input the ride request date
     while True:
         date = input('Please enter the ride request date in format yyyy-mm-dd: ')
+        # validate the date format
         try:
             datetime.datetime.strptime(date, '%Y-%m-%d')
             break
@@ -40,6 +42,7 @@ def feature4(conn, email):
             from locations;
             ''')
         allLcode = [lcode for subtuples in c.fetchall() for lcode in subtuples]
+        # check if the lcode is valid and exists
         if plcode in allLcode:
             break
         else:
@@ -58,6 +61,7 @@ def feature4(conn, email):
             from locations;
             ''')
         allLcode = [lcode for subtuples in c.fetchall() for lcode in subtuples]
+        # check if the lcode is valid and exists
         if dlcode in allLcode:
             break
         else:
@@ -71,6 +75,7 @@ def feature4(conn, email):
     # input the amount per seat
     while True:
         amount = input('Please enter the amount you are willing to pay per seat: ')
+        # amount should be non-negative int
         try:
             amount = int(amount)
             if amount < 0:

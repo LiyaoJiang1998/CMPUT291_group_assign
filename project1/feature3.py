@@ -1,7 +1,12 @@
 import sqlite3
 
+
 def addBooking(conn, email):
-    c = conn.cursor();
+    '''
+    book a memeber on a ride provided by the user
+    '''
+    c = conn.cursor()
+
     # validate if the driver provided the given rno
     while True:
         rno = input('please enter the rno for the ride you want to book a member : ')
@@ -10,9 +15,10 @@ def addBooking(conn, email):
             select driver
             from rides
             where rno = ?;
-            ''',(rno,))
+            ''', (rno,))
         driver = c.fetchone()
-        if driver == None:
+        # case invalid rno
+        if driver is None:
             print('invalid rno!!')
             choice = input('Enter y to try enter the rno again, else quit booking: ')
             if choice == 'y' or choice == 'Y':
@@ -20,8 +26,10 @@ def addBooking(conn, email):
             else:
                 return
         else:
+            # the user provided this ride
             if driver[0] == email:
                 break
+            # the user did not provide this ride
             else:
                 print('you did not provide this ride!')
                 choice = input('Enter y to try enter the rno again, else quit booking: ')
@@ -38,8 +46,10 @@ def addBooking(conn, email):
             from members;
             ''')
         allEmail = [email for subtuples in c.fetchall() for email in subtuples]
+        # a valid email
         if who in allEmail:
             break
+        # invalid email
         else:
             print('this member email does not exist!')
             choice = input('Enter y to try enter the email again, else quit booking: ')
@@ -71,19 +81,21 @@ def addBooking(conn, email):
             select available
             from ride_info
             where rno = ?;
-            ''',(rno,))
+            ''', (rno,))
 
         availableSeats = c.fetchone()
-        if availableSeats == None:
+        # if a ride is not in ride_info, it is in the past
+        # should not book someone into a ride in the past
+        if availableSeats is None:
             print('this ride is in the past')
             return
         else:
             availableSeats = availableSeats[0]
 
-
         numSeat = input('Enter the number of seats that you want to book: ')
         try:
             numSeat = int(numSeat)
+        # when input is not a interger
         except ValueError as e:
             print('invalid number')
             choice = input('Enter y to try enter the number again, else quit booking: ')
@@ -92,6 +104,7 @@ def addBooking(conn, email):
             else:
                 return
 
+        # should be a positive int
         if numSeat <= 0:
             print('invalid number')
             choice = input('Enter y to try enter the number again, else quit booking: ')
@@ -99,7 +112,7 @@ def addBooking(conn, email):
                 continue
             else:
                 return
-
+        # case of overbooking
         elif numSeat > availableSeats:
             print('available seats are not enough, you are over booking!')
             choice = input('Enter y if you are sure, else quit booking: ')
@@ -115,6 +128,7 @@ def addBooking(conn, email):
         bCost = input('Please enter the cost per seat: ')
         try:
             bCost = int(bCost)
+            # if it is negative cost
             if bCost < 0:
                 print('invalid cost')
                 choice = input('Enter y to try enter the cost again, else quit booking: ')
@@ -124,7 +138,7 @@ def addBooking(conn, email):
                     return
             else:
                 break
-
+        # not a integer
         except ValueError as e:
             print('invalid cost')
             choice = input('Enter y to try enter the cost again, else quit booking: ')
@@ -141,6 +155,7 @@ def addBooking(conn, email):
             from locations;
             ''')
         allLcode = [lcode for subtuples in c.fetchall() for lcode in subtuples]
+        # verifying the lcode valid or not
         if plcode in allLcode:
             break
         else:
@@ -159,6 +174,7 @@ def addBooking(conn, email):
             from locations;
             ''')
         allLcode = [lcode for subtuples in c.fetchall() for lcode in subtuples]
+        # verifying the lcode valid or not
         if dlcode in allLcode:
             break
         else:
@@ -175,7 +191,7 @@ def addBooking(conn, email):
         from bookings;
         ''')
     bno = c.fetchone()
-    if bno == None:
+    if bno is None:
         bno = 1
     else:
         bno = bno[0] + 1
@@ -196,11 +212,12 @@ def addBooking(conn, email):
         ''',(receiver,email,content,rno,'n'))
     conn.commit()
 
+
 def listAllRides(conn, email):
     '''
     list all the rides the member offers with # of available seats
     '''
-    c = conn.cursor();
+    c = conn.cursor()
     # create a view about each ride
     c.execute('''
         drop view if exists ride_info;
@@ -224,11 +241,13 @@ def listAllRides(conn, email):
         where driver = ? ;
         ''', (email,))
 
+    # the column names
     print("All the rides provided: ")
     names = tuple(map(lambda x: x[0], c.description))
     print(names)
 
     ridesRows = c.fetchall()
+    # more than 5, option of see more
     if len(ridesRows) > 5:
         for e in ridesRows[:5]:
             print(e)
@@ -245,11 +264,12 @@ def listAllRides(conn, email):
         for e in ridesRows:
             print(e)
 
+
 def listAllBooking(conn, email):
     '''
     list all bookings on rides s/he offers and cancel any booking.
     '''
-    c = conn.cursor();
+    c = conn.cursor()
 
     c.execute('''
         select b.bno, b.email, b.rno, b.cost, b.seats, b.pickup, b.dropoff
@@ -258,16 +278,24 @@ def listAllBooking(conn, email):
         ''', (email,))
     conn.commit()
 
+    # column names
     print("All the bookings associate with rides provided by you: ")
     names = tuple(map(lambda x: x[0], c.description))
     print(names)
 
+    # all the asssociated bookings
     bookingsRows = c.fetchall()
     for e in bookingsRows:
         print(e)
 
+
 def cancelBooking(conn, email):
-    c = conn.cursor();
+    '''
+    cancel a bookings on a ride provided by user
+    '''
+    c = conn.cursor()
+
+    # get the bno input
     while True:
         bno = input('please enter the bno for the booking you need to cancel: ')
         # save the user who booked that ride:
@@ -277,7 +305,7 @@ def cancelBooking(conn, email):
             where bno = ?;
             ''',(bno,))
         receiver = c.fetchone()
-        if receiver == None:
+        if receiver is None:
             print('invalid bno!!')
             choice = input('Enter y to try enter the bno again, else quit canceling: ')
             if choice == 'y' or choice == 'Y':
@@ -291,6 +319,7 @@ def cancelBooking(conn, email):
                 where b.bno = ? and b.rno = r.rno;
                 ''',(bno,))
             (provider,ridenum) = c.fetchone()
+            # validate the provider
             if provider == email:
                 break
             else:
@@ -324,7 +353,11 @@ def cancelBooking(conn, email):
 
     conn.commit()
 
+
 def feature3(conn, email):
+    '''
+    feature3 sub menu, take input to enter different mode
+    '''
     while True:
         print()
         print('Select which function to use: ')
