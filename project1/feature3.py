@@ -233,7 +233,7 @@ def listAllBooking(conn, email):
         ''', (email,))
     conn.commit()
 
-    print("All the rides provided: ")
+    print("All the bookings associate with rides provided by you: ")
     names = tuple(map(lambda x: x[0], c.description))
     print(names)
 
@@ -299,9 +299,38 @@ def cancelBooking(conn, email):
 
     conn.commit()
 
+def feature3(conn, email):
+    while True:
+        print()
+        print('Select which function to use: ')
+        print('1, list all the associated bookings')
+        print('2, cancel a booking')
+        print('3, list all the rides you provided')
+        print('4, add a booking to a ride provided by you')
+        print('otherwise, go back to the main menu')
+        mode = input()
+        print()
+        if mode == '1':
+            listAllBooking(conn, email)
+            print("-----------------finished-----------------")
+        elif mode == '2':
+            cancelBooking(conn, email)
+            print("-----------------finished-----------------")
+        elif mode == '3':
+            listAllRides(conn, email)
+            print("-----------------finished-----------------")
+        elif mode == '4':
+            addBooking(conn, email)
+            print("-----------------finished-----------------")
+        else:
+            print("exiting feature3 ......")
+            return
 
 if __name__ == '__main__':
+    # feature3 test
     conn = sqlite3.connect('./project1.db')
+    email = 'whatever@e.com'
+    feature3(conn,email)
 
     # email = 'joe@gmail.com' # test listAllBooking
     # listAllBooking(conn, email)
