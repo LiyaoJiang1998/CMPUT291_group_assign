@@ -9,7 +9,7 @@ def addBooking(conn, email):
         c.execute('''
             select driver
             from rides
-            where rno = ?
+            where rno = ?;
             ''',(rno,))
         driver = c.fetchone()
         if driver == None:
@@ -35,7 +35,7 @@ def addBooking(conn, email):
         who = input('Please input who (email) you want to book for this ride: ')
         c.execute('''
             select email
-            from members
+            from members;
             ''')
         allEmail = [email for subtuples in c.fetchall() for email in subtuples]
         if who in allEmail:
@@ -54,7 +54,7 @@ def addBooking(conn, email):
         c.execute('''
             select available
             from ride_info
-            where rno = ?
+            where rno = ?;
             ''',(rno,))
         availableSeats = c.fetchone()[0]
 
@@ -115,7 +115,7 @@ def addBooking(conn, email):
         plcode = input('Please enter the pickup location lcode: ')
         c.execute('''
             select lcode
-            from locations
+            from locations;
             ''')
         allLcode = [lcode for subtuples in c.fetchall() for lcode in subtuples]
         if plcode in allLcode:
@@ -133,7 +133,7 @@ def addBooking(conn, email):
         dlcode = input('Please eneter the dropoff location lcode: ')
         c.execute('''
             select lcode
-            from locations
+            from locations;
             ''')
         allLcode = [lcode for subtuples in c.fetchall() for lcode in subtuples]
         if dlcode in allLcode:
@@ -249,7 +249,7 @@ def cancelBooking(conn, email):
         c.execute('''
             select email
             from bookings
-            where bno = ?
+            where bno = ?;
             ''',(bno,))
         receiver = c.fetchone()
         if receiver == None:
@@ -263,7 +263,7 @@ def cancelBooking(conn, email):
             c.execute('''
                 select r.driver, r.rno
                 from bookings b, rides r
-                where b.bno = ? and b.rno = r.rno
+                where b.bno = ? and b.rno = r.rno;
                 ''',(bno,))
             (provider,ridenum) = c.fetchone()
             if provider == email:
