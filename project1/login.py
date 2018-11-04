@@ -2,8 +2,9 @@ import sqlite3
 import re
 import getpass
 
+# Hongru Qi
 user = ""
-
+# main operational function
 def login(conn):
     global user
     c = conn.cursor()
@@ -16,12 +17,13 @@ def login(conn):
             result = log(conn)
             if result is True:
                 break
-            # create account
+        # create account
         elif isAcc == "n":
             print("Please create your account")
             result = signup(conn)
             if result is True:
                 break
+        # quit the program
         elif isAcc == "q":
             return False
         else:
@@ -32,10 +34,10 @@ def log(conn):
     global user
     c = conn.cursor()
     while True:
-        print("if you want to go back to the last screen, enter (quit)")
+        print("if you want to go back to the last screen, enter q")
         userName = input("Please enter your user name (email):")
         # check if user wants to quit
-        if re.match("^\\(quit\\)$", userName):
+        if userName == "q":
             return False
         password = getpass.getpass("Please enter your password:")
         check = checkUserNameAndPassword(conn, userName, password)
@@ -65,6 +67,7 @@ def checkUserNameAndPassword(conn, userName, password):
         print("Invalid user name or password, pleae try again")
         return False
 
+# show unread message
 def showUnreadMessage(conn, userName):
     c = conn.cursor()
     c.execute('SELECT msgTimestamp, sender, content, rno from inbox where email=? and seen=?;', (userName, 'n'))
@@ -77,31 +80,37 @@ def showUnreadMessage(conn, userName):
         conn.commit()
         tmp += 1
 
+# register an account
 def signup(conn):
     global user
     c = conn.cursor()
     while True:
         userName = signupUserName(conn)
+        # quit
         if userName is True:
             return False
+        # invalid userName
         elif userName is False:
             continue
         else:
             break
     while True:
         password = signupPwd(conn)
+        # invalid password
         if password is False:
             continue
         else:
             break
     while True:
         name = signupName(conn)
+        # invalid name
         if name is False:
             continue
         else:
             break
     while True:
         phone = signupPhone(conn)
+        # invalid phone number
         if phone is False:
             continue
         else:
@@ -115,9 +124,9 @@ def signup(conn):
 def signupUserName(conn):
     c = conn.cursor()
     # check the valid user name
-    print("if you want to go back to the last screen, enter (quit)")
+    print("if you want to go back to the last screen, enter q")
     userName = input("Please enter your user name (email): ")
-    if re.match("^\\(quit\\)$", userName):
+    if userName == "q":
         return True
     if re.match("^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$", userName):
         # check if the user name already exists
@@ -143,6 +152,7 @@ def signupPwd(conn):
 
 def signupName(conn):
     c = conn.cursor()
+    # check name
     name = input("Please enter your name: ")
     if re.match("^[ A-Za-z]*$", name):
         return name
@@ -152,6 +162,7 @@ def signupName(conn):
 
 def signupPhone(conn):
     c = conn.cursor()
+    # check phone number
     phone = input("Please enter your phone number: ")
     if re.match("^[0-9]*$", phone):
         return phone

@@ -1,36 +1,46 @@
 import sqlite3
 import re
 
+# Hongru Qi
+# search rides by up to 3 keywords
 def searchRide(conn, email):
     c = conn.cursor()
     keyword = input("Please enter up to 3 location keywords (seperated by space) or (quit) to quit: ")
+    # quit
     if keyword == "(quit)":
         return False
     keywords = keyword.split()
     findRides = ""
-
+    # counter of keywords
     tmp1 = 0
+    # more than one keyword
     if len(keywords) > 1:
         for keyword in keywords:
-            tmp = 0
             findRides += "select * from ("
+            # get the lcodes for each keyword
             lcodes = locationSearch(conn, keyword)
             lcodes = [x for subtuples in lcodes for x in subtuples]
+            # counter of lcode of each keyword
+            tmp = 0
+            # get the union of rides which satisfies any one of the lcode that the keyword matches
             for lcode in lcodes:
                 if tmp < len(lcodes) - 1:
                     findRides += (rideSearch(lcode) + " union ")
                 else:
                     findRides += rideSearch(lcode)
                 tmp += 1
-
+            # get the intersection of each union (result matches all three keywords)
             if tmp1 < len(keywords) - 1:
                 findRides += ") intersect "
             else:
                 findRides += ")"
             tmp1 += 1
+    # only one keyword
     else:
+        # get the lcodes
         lcodes = locationSearch(conn, keywords[0])
         lcodes = [x for subtuples in lcodes for x in subtuples]
+        # counter of lcode
         tmp = 0
         for lcode in lcodes:
             if tmp < len(lcodes) - 1:
@@ -38,9 +48,9 @@ def searchRide(conn, email):
             else:
                 findRides += rideSearch(lcode) + ";"
             tmp += 1
-    print(findRides)
     c.execute(findRides)
     rides = c.fetchall()
+    # let the user to make selection to send message
     while True:
         selection = displayAndSelect(rides)
         if selection is True:
@@ -48,14 +58,20 @@ def searchRide(conn, email):
         if selection is "":
             break
         sendMsg(conn, selection, email)
+        ano = input("Message sent, enter y to send another message or q to quit: ")
+        if ano == "y":
+            continue
+        else:
+            break
 
+# main operational function
 def mainOp(conn, email):
     while True:
         result = searchRide(conn, email)
         if result is False:
             break
 
-
+# construct the search command
 def rideSearch(keyword):
     findRide = '''
                 select distinct(r.rno), r.price, r.rdate, r.seats, r.lugDesc, r.src, r.dst, r.driver, r.cno, t1.make, t1.model, t1.year, t1.seats, t1.owner
@@ -69,6 +85,7 @@ def rideSearch(keyword):
 
     return findRide
 
+# search the lcodes by keyword
 def locationSearch(conn, keyword):
     #global conn, cur
     cur = conn.cursor()
@@ -87,13 +104,15 @@ def locationSearch(conn, keyword):
     #get all the matches and return
     return cur.fetchall()
 
+# show the seached rides and let the user to make selection
 def displayAndSelect(results):
     if len(results) == 0:
         print('no results found')
         return ''
-    #print
+    #print title
     print("ride no | price | ride date | seats | luggage Description | source | destination | driver | car no | car make | car model | year of car | seats of car | car owner")
     for i in range(0, len(results), 5):
+        # more than 5 results, only print 5
         if len(results) <= i+5:
             for j in range(i, len(results)):
                 print(results[j])
@@ -104,7 +123,7 @@ def displayAndSelect(results):
                 if re.match('^[1-{0}]$'.format(len(results)-i), selection):
                     break
                 print('invalid selection')
-
+        # less than 5 results, print all
         else:
             for j in range(i, i+5):
                 print(results[j])
@@ -121,9 +140,11 @@ def displayAndSelect(results):
 
     return results[i+int(selection)-1]
 
+# send message to the selected driver
 def sendMsg(conn, selection, email):
     c = conn.cursor()
     msg = input("Please enter your msg or (quit) to go to the previous page: ")
+    # quit
     if msg == "(quit)":
         return
     c.execute('INSERT into inbox values (?, datetime("now", "localtime"), ?, ?, ?, ?);', (selection[7], email, msg, selection[0], 'n'))
