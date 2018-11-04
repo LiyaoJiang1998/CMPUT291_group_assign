@@ -14,8 +14,8 @@ inputs:
     conn: connestion to db
 '''
 def insertEnroute(rno, enroute, conn):
-    #assert type(rno) is IntType, 'rno is not integer'
-    #assert type(enroute) is SetType,
+    assert isinstance(rno, int), 'rno is not integer in insertEnroute'
+    assert isinstance(enroute, set), 'enroute is not set in insertEnroute'
     cur = conn.cursor()
     insert = '''
                 INSERT INTO enroute VALUES (?, ?);
@@ -24,7 +24,7 @@ def insertEnroute(rno, enroute, conn):
         tup = tuple([rno, lcode])
         cur.execute(insert, tup)
     
-    
+
     return
 
 
@@ -36,6 +36,7 @@ input:
     conn: connection to db
 '''
 def insertRide(final, conn):
+    assert len(final) == 9, 'final is the wrong size in insertRide'
     cur = conn.cursor()
     cur.execute('INSERT INTO rides VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);', final)
 
@@ -60,6 +61,8 @@ checks if car is valid
 returns True or False
 '''
 def carValid(carNo, email, conn):
+    assert isinstance(carNo, int), 'carNo is not int in carValid'
+    assert isinstance(email, str), 'emails is not string in carValid'
     cur = conn.cursor()
     findcar = '''
                 SELECT *
@@ -116,7 +119,7 @@ def displayAndSelect(results, infoIndex):
             for j in range(i, len(results)):
                 print(results[j])
             while 1: #promtinput
-                selection = input('select options: 1-{0} or ''q'' to quit:'.format(len(results)-i))
+                selection = input('select options: 1-{0} or \'q\' to quit:'.format(len(results)-i))
                 if selection == 'q':
                     return ''
                 if re.match('^[1-{0}]$'.format(len(results)-i), selection):
@@ -127,7 +130,7 @@ def displayAndSelect(results, infoIndex):
             for j in range(i, i+5):
                 print(results[j])
             while 1:
-                selection = input('select options: 1-5, ''y'' to view more, ''q'' to quit:')
+                selection = input('select options: 1-5, \'y\' to view more, \'q\' to quit:')
                 if selection == 'q':
                     return ''
                 if re.match('^[1-5y]$', selection):
@@ -135,21 +138,10 @@ def displayAndSelect(results, infoIndex):
                 print('invalid selection')
             if selection == 'y':
                 continue
-            else: break
+            else: 
+                break
                 
     return results[i+int(selection)-1][infoIndex]
-
-    #display search results
-    '''
-    if len(locations) < 5:
-        for row in locations:
-            print(row)
-        selection = input('select location(1~{0}) or ''q'' to quit search or ''a'' to search again:'.format(len(locations)))
-        if selection == 'q':
-            return
-    '''
-
-    return
 
 def main():
     global conn, cur

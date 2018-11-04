@@ -135,8 +135,12 @@ def postOffer(email, conn):
 
         #print(info)
         #print(enroute)
+        decision = input('proceed with values given? \'y\' to continue, anything else start over: ')
+        if decision == 'y':
+            break 
+        else:
+            continue 
 
-        break
     rno = getUniqueRno(conn)
     final = tuple([rno] + info)
     insertRide(final, conn)
