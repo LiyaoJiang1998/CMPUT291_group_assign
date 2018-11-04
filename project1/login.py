@@ -10,7 +10,7 @@ def login(conn):
     print("Welcome to our system! Please login first.")
     # log in or create new account
     while True:
-        isAcc = input("Do you have an account? Please enter y if have and n if not:")
+        isAcc = input("Do you have an account? Please enter y if have and n if not or q to quit:")
         # log in
         if isAcc == "y":
             result = log(conn)
@@ -22,6 +22,8 @@ def login(conn):
             result = signup(conn)
             if result is True:
                 break
+        elif isAcc == "q":
+            return False
         else:
             print("invalid input")
     return user

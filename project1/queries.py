@@ -21,7 +21,8 @@ def insertEnroute(rno, enroute, conn):
     for lcode in enroute:
         tup = tuple([rno, lcode])
         cur.execute(insert, tup)
-    
+        conn.commit()
+
 
     return
 
@@ -37,7 +38,7 @@ def insertRide(final, conn):
     assert len(final) == 9, 'final is the wrong size in insertRide'
     cur = conn.cursor()
     cur.execute('INSERT INTO rides VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);', final)
-
+    conn.commit()
     return
 
 
@@ -81,7 +82,7 @@ def carValid(carNo, email, conn):
 def locationSearch(keyword, conn):
     #global conn, cur
     cur = conn.cursor()
-    #find 
+    #find
     findLoc = '''
                 SELECT *
                 FROM locations
@@ -124,7 +125,7 @@ def displayAndSelect(results, infoIndex):
                 if re.match('^[1-{0}]$'.format(len(results)-i), selection):
                     break
                 print('invalid selection')
-        
+
         else:
             for j in range(i, i+5):
                 print(results[j])
@@ -137,9 +138,9 @@ def displayAndSelect(results, infoIndex):
                 print('invalid selection')
             if selection == 'y':
                 continue
-            else: 
+            else:
                 break
-                
+
     return results[i+int(selection)-1][infoIndex]
 
 def main():
@@ -147,10 +148,10 @@ def main():
     path = "./test.db"
     conn = sqlite3.connect(path)
     cur = conn.cursor()
-    
+
     rno = getUniqueRno(conn)
     print(rno)
-    
+
     '''
     keyword = input('keyword: ')
     result = displayAndSelect(locationSearch(keyword, conn), 0)

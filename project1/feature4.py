@@ -98,6 +98,7 @@ def feature4(conn, email):
         ''', (rid,email,date,plcode,dlcode,amount))
     conn.commit()
 
+
 if __name__ == '__main__':
     # feature4 test
     conn = sqlite3.connect('./project1.db')

@@ -50,13 +50,36 @@ def addBooking(conn, email):
 
     # input number of seat
     while True:
+        # create a view about each ride
+        c.execute('''
+            drop view if exists ride_info;
+            ''')
+        conn.commit()
+        c.execute('''
+            create view ride_info(driver, rno, booked, available, rdate, price, src, dst)
+            as
+            select r.driver, r.rno, coalesce(sum(b.seats),0), r.seats-coalesce(sum(b.seats),0),
+                 r.rdate, r.price, ls.city, ld.city
+            from rides r left outer join bookings b on b.rno = r.rno, locations ls, locations ld
+            where ls.lcode = r.src and ld.lcode = r.dst
+            and r.rdate > datetime('now','localtime')
+            group by r.driver, r.rno, r.seats, r.rdate, r.price, ls.city, ld.city;
+            ''')
+        conn.commit()
         # how many seats are available?
         c.execute('''
             select available
             from ride_info
             where rno = ?;
             ''',(rno,))
-        availableSeats = c.fetchone()[0]
+
+        availableSeats = c.fetchone()
+        if availableSeats == None:
+            print('this ride is in the past')
+            return
+        else:
+            availableSeats = availableSeats[0]
+
 
         numSeat = input('Enter the number of seats that you want to book: ')
         try:
@@ -163,6 +186,7 @@ def addBooking(conn, email):
         insert into bookings
         values (?,?,?,?,?,?,?);
         ''',(bno,who,rno,bCost,numSeat,plcode,dlcode))
+    conn.commit()
     # send the proper message
     receiver = who
     content = 'you are booked on the ride: %s, the bno is: %s'%(rno,bno)
@@ -181,6 +205,7 @@ def listAllRides(conn, email):
     c.execute('''
         drop view if exists ride_info;
         ''')
+    conn.commit()
     c.execute('''
         create view ride_info(driver, rno, booked, available, rdate, price, src, dst)
         as
@@ -188,16 +213,16 @@ def listAllRides(conn, email):
              r.rdate, r.price, ls.city, ld.city
         from rides r left outer join bookings b on b.rno = r.rno, locations ls, locations ld
         where ls.lcode = r.src and ld.lcode = r.dst
-        and r.rdate > datetime('now','localtime')
         group by r.driver, r.rno, r.seats, r.rdate, r.price, ls.city, ld.city;
         ''')
+    conn.commit()
+
     # fetch the rides provided by this membber
     c.execute('''
         select rno, driver, available
         from ride_info
         where driver = ? ;
         ''', (email,))
-    conn.commit()
 
     print("All the rides provided: ")
     names = tuple(map(lambda x: x[0], c.description))

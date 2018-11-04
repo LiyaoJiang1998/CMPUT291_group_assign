@@ -7,9 +7,10 @@ def singleSearch(conn, email):
     requests = c.fetchall()
     printRequests(conn, email, requests)
 
-def delete(conn, rid):
+def delete(conn, rid, email):
     c = conn.cursor()
-    c.execute('DELETE from requests where rid=?;', (rid,))
+    c.execute('DELETE from requests where rid=? and email=?;', (rid,email))
+    conn.commit()
 
 def searchByLcode(conn, email, lcode):
     c = conn.cursor()
@@ -33,6 +34,8 @@ def printRequests(conn, email, requests):
     while True:
         selection = displayAndSelect(requests)
         if selection is True:
+            return
+        elif selection is "":
             return
         else:
             content = input("Please enter the massage content or q to quit: ")
@@ -77,7 +80,7 @@ def operation(conn, email):
             rid = input("Please enter the request ID of the request to delete or q to go to the previous screen: ")
             if rid == "q":
                 break
-            delete(conn, rid)
+            delete(conn, rid, email)
     elif op == 'q':
         return False
     else:

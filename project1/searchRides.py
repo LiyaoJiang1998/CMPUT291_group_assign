@@ -3,22 +3,26 @@ import re
 
 def searchRide(conn, email):
     c = conn.cursor()
-    keyword = input("Please enter up to 3 location keywords (seperated by space): ")
+    keyword = input("Please enter up to 3 location keywords (seperated by space) or (quit) to quit: ")
+    if keyword == "(quit)":
+        return False
     keywords = keyword.split()
     findRides = ""
-    tmp = 0
+
     tmp1 = 0
     if len(keywords) > 1:
         for keyword in keywords:
+            tmp = 0
             findRides += "select * from ("
             lcodes = locationSearch(conn, keyword)
             lcodes = [x for subtuples in lcodes for x in subtuples]
             for lcode in lcodes:
-                if tmp < len(keyword):
+                if tmp < len(lcodes) - 1:
                     findRides += (rideSearch(lcode) + " union ")
                 else:
                     findRides += rideSearch(lcode)
                 tmp += 1
+
             if tmp1 < len(keywords) - 1:
                 findRides += ") intersect "
             else:
@@ -34,15 +38,22 @@ def searchRide(conn, email):
             else:
                 findRides += rideSearch(lcode) + ";"
             tmp += 1
-
+    print(findRides)
     c.execute(findRides)
     rides = c.fetchall()
     while True:
         selection = displayAndSelect(rides)
         if selection is True:
             break
+        if selection is "":
+            break
         sendMsg(conn, selection, email)
-    return rides
+
+def mainOp(conn, email):
+    while True:
+        result = searchRide(conn, email)
+        if result is False:
+            break
 
 
 def rideSearch(keyword):
@@ -113,5 +124,7 @@ def displayAndSelect(results):
 def sendMsg(conn, selection, email):
     c = conn.cursor()
     msg = input("Please enter your msg or (quit) to go to the previous page: ")
-    c.execute('INSERT into inbox values (?, datetime("now", "localtime"), ?, ?, ?, ?);', (email, selection[7], msg, selection[0], 'n'))
+    if msg == "(quit)":
+        return
+    c.execute('INSERT into inbox values (?, datetime("now", "localtime"), ?, ?, ?, ?);', (selection[7], email, msg, selection[0], 'n'))
     conn.commit()
