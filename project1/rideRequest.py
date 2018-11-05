@@ -36,7 +36,7 @@ def sendMessage(conn, email, receiver, content):
     c.execute('INSERT into inbox (email, msgTimestamp, sender, content, seen) values (?, datetime("now"), ?, ?, ?);', (receiver,  email, content, 'n'))
     conn.commit()
 
-# print the searched requests
+# print the searched requests and let user to select to delete or send message
 def makeSelection(conn, email, requests, type):
     while True:
         if type == "1":
@@ -68,7 +68,7 @@ def makeSelection(conn, email, requests, type):
                     break
     return
 
-# display the searched results and make selections to send message
+# display the searched results and make selections
 def displayAndSelect(results, arg):
     if len(results) == 0:
         print('no results found')
@@ -128,24 +128,6 @@ def search(conn, email):
         return False
     else:
         print("Invalid input")
-
-
-# # get the user's operation
-# def getOperation(conn, email):
-#     print("Do you want to search or delete or send message?")
-#     print("Enter q to go back to the previous screen")
-#     op = input("Enter 1 for search, 2 for delete: ")
-#     # seach requests
-#     if op == '1':
-#         while True:
-#             result = search(conn, email)
-#             if result is False:
-#                 break
-#     # quit
-#     elif op == 'q':
-#         return False
-#     else:
-#         print("Invalid input")
 
 # main opeational function
 def searchAndDelete(conn, email):
