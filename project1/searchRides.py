@@ -4,6 +4,7 @@ import re
 # Hongru Qi
 # search rides by up to 3 keywords
 def searchRide(conn, email):
+    print("Search location by keywords")
     c = conn.cursor()
     keyword = input("Please enter up to 3 location keywords (seperated by space) or (quit) to quit: ")
     # quit
@@ -117,6 +118,7 @@ def displayAndSelect(results):
             for j in range(i, len(results)):
                 print(results[j])
             while 1: #promtinput
+                print("To contact the request publisher select one to send message.")
                 selection = input('select options: 1-{0} or ''q'' to quit:'.format(len(results)-i))
                 if selection == 'q':
                     return True
@@ -128,7 +130,8 @@ def displayAndSelect(results):
             for j in range(i, i+5):
                 print(results[j])
             while 1:
-                selection = input('select options: 1-5, ''y'' to view more, ''q'' to quit:')
+                print("To contact the request publisher select one to send message.")
+                selection = input(' select options: 1-5, ''y'' to view more, ''q'' to quit:')
                 if selection == 'q':
                     return True
                 if re.match('^[1-5y]$', selection):
