@@ -59,10 +59,8 @@ def searchRide(conn, email):
         if selection is "":
             break
         sendMsg(conn, selection, email)
-        ano = input("Message sent, enter y to send another message or q to quit: ")
+        ano = input("Message sent, enter y to send another message or enter any key to quit: ")
         if ano == "y":
-            continue
-        else:
             break
 
 # main operational function

@@ -56,10 +56,8 @@ def makeSelection(conn, email, requests):
             if content == "q":
                 return
             sendMessage(conn, email, selection[1], content)
-            ano = input("Message sent, enter y to send another message or q to quit: ")
-            if ano == "y":
-                continue
-            else:
+            ano = input("Message sent, enter y to send another message or enter any key to quit: ")
+            if ano != "y":
                 break
             return
 
@@ -143,6 +141,10 @@ def getOperation(conn, email):
             if rid == "q":
                 break
             delete(conn, rid, email)
+            ano = input("Do you want to delete another requests? Enter y to delete or enter any key to quit: ")
+            if ano != "y":
+                break;
+
     # quit
     elif op == 'q':
         return False
