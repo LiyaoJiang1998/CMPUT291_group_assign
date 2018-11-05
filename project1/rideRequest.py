@@ -12,13 +12,9 @@ def userSearch(conn, email, type):
 # delete request
 def delete(conn, rid, email):
     c = conn.cursor()
-    c.execute('SELECT * from requests where rid=? and email=?;', (rid, email))
-    request = c.fetchone()
-    if request is None:
-        print("the request is not posted by you and you cannot delete it")
-    else:
-        c.execute('DELETE from requests where rid=? and email=?;', (rid,email))
-        conn.commit()
+    c.execute('DELETE from requests where rid=? and email=?;', (rid,email))
+    conn.commit()
+    print("Request deleted")
 
 # search requests by lcode
 def searchByLcode(conn, email, lcode, type):
@@ -44,10 +40,9 @@ def sendMessage(conn, email, receiver, content):
 def makeSelection(conn, email, requests, type):
     while True:
         if type == "1":
-            display(requests)
-            break
+            selection = displayAndSelect(requests, "delete request")
         else:
-            selection = displayAndSelect(requests)
+            selection = displayAndSelect(requests, "send message")
         # quit
         if selection is True:
             return
@@ -56,34 +51,25 @@ def makeSelection(conn, email, requests, type):
             return
         # send message
         else:
-            content = input("Please enter the massage content or q to quit: ")
-            if content == "q":
-                return
-            sendMessage(conn, email, selection[1], content)
-            ano = input("Message sent, enter y to send another message or enter any key to quit: ")
-            if ano != "y":
-                break
-            return
-
-def display(results):
-    if len(results) == 0:
-        print('no results found')
-        return ''
-    #print
-    print("request ID | request date | pickup location | dropoff location | amount")
-    for i in range(0, len(results), 5):
-        # more than 5, only print 5
-        if len(results) <= i+5:
-            for j in range(i, len(results)):
-                print(results[j])
-        # less than 5, print all
-        else:
-            for j in range(i, i+5):
-                print(results[j])
-
+            if type == "1":
+                confirm = input("Do you want to delete this request? Enter y to confirm or any key to quit: ")
+                if confirm != "y":
+                    return
+                else:
+                    delete(conn, selection[0], email)
+                    break
+            else:
+                content = input("Please enter the message content or q to quit: ")
+                if content == "q":
+                    return
+                sendMessage(conn, email, selection[1], content)
+                ano = input("Message sent, enter y to send another message or enter any key to quit: ")
+                if ano != "y":
+                    break
+    return
 
 # display the searched results and make selections to send message
-def displayAndSelect(results):
+def displayAndSelect(results, arg):
     if len(results) == 0:
         print('no results found')
         return ''
@@ -95,7 +81,7 @@ def displayAndSelect(results):
             for j in range(i, len(results)):
                 print(results[j])
             while 1: #promtinput
-                selection = input('select one to send message (options: 1-{0}) or ''q'' to quit:'.format(len(results)-i))
+                selection = input("select one to " + arg + ' (options: 1-{0}) or ''q'' to quit:'.format(len(results)-i))
                 if selection == 'q':
                     return True
                 if re.match('^[1-{0}]$'.format(len(results)-i), selection):
@@ -106,7 +92,7 @@ def displayAndSelect(results):
             for j in range(i, i+5):
                 print(results[j])
             while 1:
-                selection = input('select one to send message (options: 1-5), ''y'' to view more, ''q'' to quit:')
+                selection = input('select one to ' + arg + ' (options: 1-5), ''y'' to view more, ''q'' to quit:')
                 if selection == 'q':
                     return True
                 if re.match('^[1-5y]$', selection):
@@ -120,7 +106,7 @@ def displayAndSelect(results):
 
 # search requests (main search operation)
 def search(conn, email):
-    searchOp = input("Enter 1 to search your requests and 2 to search by location or q to go to the previous screen: ")
+    searchOp = input("Enter 1 to search your requests and 2 to search by location or q to go to the main page: ")
     # search user's requests
     if searchOp == '1':
         userSearch(conn, email, searchOp)
@@ -144,37 +130,26 @@ def search(conn, email):
         print("Invalid input")
 
 
-# get the user's operation
-def getOperation(conn, email):
-    print("Do you want to search or delete or send message?")
-    print("Enter q to go back to the previous screen")
-    op = input("Enter 1 for search, 2 for delete: ")
-    # seach requests
-    if op == '1':
-        while True:
-            result = search(conn, email)
-            if result is False:
-                break
-    # delete requests
-    elif op == '2':
-        while True:
-            rid = input("Please enter the request ID of the request to delete or q to go to the previous screen: ")
-            if rid == "q":
-                break
-            delete(conn, rid, email)
-            ano = input("Do you want to delete another requests? Enter y to delete or enter any key to quit: ")
-            if ano != "y":
-                break;
-
-    # quit
-    elif op == 'q':
-        return False
-    else:
-        print("Invalid input")
+# # get the user's operation
+# def getOperation(conn, email):
+#     print("Do you want to search or delete or send message?")
+#     print("Enter q to go back to the previous screen")
+#     op = input("Enter 1 for search, 2 for delete: ")
+#     # seach requests
+#     if op == '1':
+#         while True:
+#             result = search(conn, email)
+#             if result is False:
+#                 break
+#     # quit
+#     elif op == 'q':
+#         return False
+#     else:
+#         print("Invalid input")
 
 # main opeational function
 def searchAndDelete(conn, email):
     while True:
-        command = getOperation(conn, email)
+        command = search(conn, email)
         if command == False:
             break

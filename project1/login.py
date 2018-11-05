@@ -167,5 +167,5 @@ def signupPhone(conn):
     if re.match("^[0-9]*$", phone):
         return phone
     else:
-        print("Invalid phone number.")
+        print("Invalid phone number, a valid phone number should be a sequence of integers only")
         return False
