@@ -66,10 +66,10 @@ def carValid(carNo, email, conn):
     findcar = '''
                 SELECT *
                 FROM cars
-                WHERE cno = {0}
-                AND owner = '{1}'
-              '''.format(carNo, email)
-    cur.execute(findcar)
+                WHERE cno = ?
+                AND owner = ?
+              '''
+    cur.execute(findcar, (carNo, email))
     result = cur.fetchall()
     if len(result) == 1:
         return True
@@ -93,13 +93,13 @@ def locationSearch(keyword, conn):
     findLoc = '''
                 SELECT *
                 FROM locations
-                WHERE lcode = '{0}'
-                OR city like '%{0}%'
-                OR prov like '%{0}%'
-                OR address like '%{0}%'
+                WHERE lcode = ?
+                OR city like ?
+                OR prov like ?
+                OR address like ?
                 COLLATE NOCASES;
-              '''.format(keyword)
-    cur.execute(findLoc)
+              '''
+    cur.execute(findLoc, (keyword, '%'+keyword+'%', '%'+keyword+'%', '%'+keyword+'%'))
 
     #get all the matches and return
     return cur.fetchall()
