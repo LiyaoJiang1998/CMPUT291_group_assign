@@ -67,12 +67,12 @@ def checkValid(result):
 
     #match price per seat
     if (re.match('[1-9][0-9]*', result[0]) == None):
-        print('invalid seats')
+        print('invalid price')
         return False
 
     #match luggage description
-    if (re.match('[a-zA-Z]{1,10}', result[3]) == None):
-        print('invalid luggage')
+    if (re.match('[a-zA-Z0-9]{1,10}', result[3]) == None):
+        print('invalid luggage description')
         return False
     
     return True
