@@ -49,7 +49,6 @@ def searchRide(conn, email):
             else:
                 findRides += rideSearch(lcode) + ";"
             tmp += 1
-    print(findRides)
     c.execute(findRides)
     rides = c.fetchall()
     # let the user to make selection to send message
