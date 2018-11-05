@@ -88,7 +88,7 @@ def feature4(conn, email):
             else:
                 break
 
-        except ValueError as e:
+        except ValueError:
             print('invalid amount')
             choice = input('Enter y to try enter the amount again, else quit adding: ')
             if choice == 'y' or choice == 'Y':
@@ -103,9 +103,11 @@ def feature4(conn, email):
         ''', (rid,email,date,plcode,dlcode,amount))
     conn.commit()
 
+    print('you successfully posted a request, rid: %s!'%(rid))
+
 
 if __name__ == '__main__':
     # feature4 test
     conn = sqlite3.connect('./project1.db')
     email = 'whatever@e.com'
-    feature4(conn,email)
+    feature4(conn, email)

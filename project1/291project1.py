@@ -22,6 +22,7 @@ def main():
             break
         # the main menu
         while True:
+            print()
             print('''Select your operation: ''')
             op = input("1 Offer a ride.\
                         \n2 Search for rides.\

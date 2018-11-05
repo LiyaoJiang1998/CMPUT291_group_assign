@@ -96,7 +96,7 @@ def addBooking(conn, email):
         try:
             numSeat = int(numSeat)
         # when input is not a interger
-        except ValueError as e:
+        except ValueError:
             print('invalid number')
             choice = input('Enter y to try enter the number again, else quit booking: ')
             if choice == 'y' or choice == 'Y':
@@ -139,7 +139,7 @@ def addBooking(conn, email):
             else:
                 break
         # not a integer
-        except ValueError as e:
+        except ValueError:
             print('invalid cost')
             choice = input('Enter y to try enter the cost again, else quit booking: ')
             if choice == 'y' or choice == 'Y':
@@ -211,6 +211,8 @@ def addBooking(conn, email):
         values (?,datetime('now','localtime'),?,?,?,?);
         ''',(receiver,email,content,rno,'n'))
     conn.commit()
+
+    print('you successfully added a booking, bno: %s!'%(bno))
 
 
 def listAllRides(conn, email):
@@ -353,6 +355,8 @@ def cancelBooking(conn, email):
 
     conn.commit()
 
+    print('you successfully canceled the booking, bno: %s!'%(bno))
+
 
 def feature3(conn, email):
     '''
@@ -384,11 +388,12 @@ def feature3(conn, email):
             print("exiting feature3 ......")
             return
 
+
 if __name__ == '__main__':
     # feature3 test
     conn = sqlite3.connect('./project1.db')
     email = 'whatever@e.com'
-    feature3(conn,email)
+    feature3(conn, email)
 
     # email = 'joe@gmail.com' # test listAllBooking
     # listAllBooking(conn, email)
