@@ -5,21 +5,21 @@ import re
 # search user's requests
 def userSearch(conn, email, type):
     c = conn.cursor()
-    c.execute('SELECT * from requests where email=?;', (email,))
+    c.execute('SELECT * from requests where email=? COLLATE NOCASE;', (email,))
     requests = c.fetchall()
     makeSelection(conn, email, requests, type)
 
 # delete request
 def delete(conn, rid, email):
     c = conn.cursor()
-    c.execute('DELETE from requests where rid=? and email=?;', (rid,email))
+    c.execute('DELETE from requests where rid=? and email=? COLLATE NOCASE;', (rid,email))
     conn.commit()
     print("Request deleted")
 
 # search requests by lcode
 def searchByLcode(conn, email, lcode, type):
     c = conn.cursor()
-    c.execute('SELECT * from requests where pickup=?;', (lcode,))
+    c.execute('SELECT * from requests where pickup=? COLLATE NOCASE;', (lcode,))
     requests = c.fetchall()
     makeSelection(conn, email, requests, type)
 

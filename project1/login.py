@@ -52,10 +52,13 @@ def checkUserNameAndPassword(conn, userName, password):
     # check if user name and password is valid
     if re.match("^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$", userName) and re.match("^[A-Za-z0-9_]*$", password):
         # check if account exists
-        c.execute('SELECT * FROM members WHERE email=? and pwd=?;' , (userName, password))
+        c.execute('SELECT pwd FROM members WHERE email=? COLLATE NOCASE;' , (userName,))
         row = c.fetchone()
         if row is None:
-            print("User name does not exist or password is incorrect. Please try again")
+            print("User name does not exist. Please try again")
+            return False
+        elif row[0] != password:
+            print("Incorrect password. Please try again")
             return False
         # if exists
         else:
@@ -70,13 +73,13 @@ def checkUserNameAndPassword(conn, userName, password):
 # show unread message
 def showUnreadMessage(conn, userName):
     c = conn.cursor()
-    c.execute('SELECT msgTimestamp, sender, content, rno from inbox where email=? and seen=?;', (userName, 'n'))
+    c.execute('SELECT msgTimestamp, sender, content, rno from inbox where email=? COLLATE NOCASE and seen=?;', (userName, 'n'))
     messages = c.fetchall()
     tmp = 1
     for message in messages:
         print("Message" + str(tmp) + ":")
-        print("time: " + message[0] + " sender " + message[1] + " content: " + message[2] + " rno " + str(message[3]))
-        c.execute('UPDATE inbox set seen=? where msgTimestamp=? and email=?;', ('y', message[0], userName))
+        print("time: " + message[0] + " sender " + message[1] + " content: " + message[2] + " rno: " + str(message[3]))
+        c.execute('UPDATE inbox set seen=? where msgTimestamp=? and email=? COLLATE NOCASE;', ('y', message[0], userName))
         conn.commit()
         tmp += 1
 
@@ -130,7 +133,7 @@ def signupUserName(conn):
         return True
     if re.match("^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$", userName):
         # check if the user name already exists
-        c.execute('SELECT email FROM members WHERE email=?;' , (userName,))
+        c.execute('SELECT email FROM members WHERE email=? COLLATE NOCASE;' , (userName,))
         row = c.fetchone()
         if row is None:
             return userName

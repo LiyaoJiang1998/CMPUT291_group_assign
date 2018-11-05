@@ -77,8 +77,8 @@ def rideSearch(keyword):
                 from rides r, enroute e
                 left outer join (select c.cno, c.make, c.model, c.year, c.seats, c.owner
                 from cars c, rides r1, enroute e1 where c.cno = r1.cno
-                and r1.cno is not null and (r1.dst = '{0}' or r1.src = '{0}' or (r1.rno = e1.rno and e1.lcode= '{0}'))) t1 on t1.cno = r.cno
-                where r.dst = '{0}' or r.src = '{0}' or (r.rno = e.rno and e.lcode= '{0}')
+                and r1.cno is not null and (r1.dst = '{0}' COLLATE NOCASE or r1.src = '{0}' COLLATE NOCASE or (r1.rno = e1.rno and e1.lcode= '{0}' COLLATE NOCASE))) t1 on t1.cno = r.cno
+                where r.dst = '{0}' COLLATE NOCASE or r.src = '{0}' COLLATE NOCASE or (r.rno = e.rno and e.lcode= '{0}' COLLATE NOCASE)
               '''.format(keyword)
 
     return findRide
@@ -91,11 +91,11 @@ def locationSearch(conn, keyword):
     findLoc = '''
                 SELECT lcode
                 FROM locations
-                WHERE lcode = '{0}'
-                OR city like '%{0}%'
-                OR prov like '%{0}%'
+                WHERE lcode = '{0}' COLLATE NOCASE
+                OR city like '%{0}%' COLLATE NOCASE
+                OR prov like '%{0}%' COLLATE NOCASE
                 OR address like '%{0}%'
-                COLLATE NOCASES;
+                COLLATE NOCASE;
               '''.format(keyword)
     cur.execute(findLoc)
 

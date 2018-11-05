@@ -67,7 +67,7 @@ def carValid(carNo, email, conn):
                 SELECT *
                 FROM cars
                 WHERE cno = ?
-                AND owner = ?
+                AND owner = ? COLLATE NOCASE
               '''
     cur.execute(findcar, (carNo, email))
     result = cur.fetchall()
@@ -93,11 +93,10 @@ def locationSearch(keyword, conn):
     findLoc = '''
                 SELECT *
                 FROM locations
-                WHERE lcode = ?
-                OR city like ?
-                OR prov like ?
-                OR address like ?
-                COLLATE NOCASES;
+                WHERE lcode = ? COLLATE NOCASE
+                OR city like ? COLLATE NOCASE
+                OR prov like ? COLLATE NOCASE
+                OR address like ? COLLATE NOCASE;
               '''
     cur.execute(findLoc, (keyword, '%'+keyword+'%', '%'+keyword+'%', '%'+keyword+'%'))
 
