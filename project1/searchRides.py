@@ -49,6 +49,7 @@ def searchRide(conn, email):
             else:
                 findRides += rideSearch(lcode) + ";"
             tmp += 1
+    print(findRides)
     c.execute(findRides)
     rides = c.fetchall()
     # let the user to make selection to send message
@@ -78,8 +79,7 @@ def rideSearch(keyword):
                 left outer join (select c.cno, c.make, c.model, c.year, c.seats, c.owner
                 from cars c, rides r1, enroute e1 where c.cno = r1.cno
                 and r1.cno is not null and (r1.dst = '{0}' or r1.src = '{0}' or (r1.rno = e1.rno and e1.lcode= '{0}'))) t1 on t1.cno = r.cno
-                where r.rno = e.rno
-                and r.dst = '{0}' or r.src = '{0}' or (r.rno = e.rno and e.lcode= '{0}')
+                where r.dst = '{0}' or r.src = '{0}' or (r.rno = e.rno and e.lcode= '{0}')
               '''.format(keyword)
 
     return findRide
@@ -116,7 +116,7 @@ def displayAndSelect(results):
             for j in range(i, len(results)):
                 print(results[j])
             while 1: #promtinput
-                print("To contact the request publisher select one to send message.")
+                print("To contact the ride publisher select one to send message.")
                 selection = input('select options: 1-{0} or ''q'' to quit:'.format(len(results)-i))
                 if selection == 'q':
                     return True
@@ -128,7 +128,7 @@ def displayAndSelect(results):
             for j in range(i, i+5):
                 print(results[j])
             while 1:
-                print("To contact the request publisher select one to send message.")
+                print("To contact the ride publisher select one to send message.")
                 selection = input(' select options: 1-5, ''y'' to view more, ''q'' to quit:')
                 if selection == 'q':
                     return True
@@ -144,7 +144,7 @@ def displayAndSelect(results):
 # send message to the selected driver
 def sendMsg(conn, selection, email):
     c = conn.cursor()
-    msg = input("Please enter your msg or (quit) to go to the previous page: ")
+    msg = input("Please enter your messagesg or (quit) to go to the previous page: ")
     # quit
     if msg == "(quit)":
         return

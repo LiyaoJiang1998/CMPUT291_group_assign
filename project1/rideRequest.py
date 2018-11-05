@@ -3,11 +3,11 @@ import re
 
 # Hongru Qi
 # search user's requests
-def userSearch(conn, email):
+def userSearch(conn, email, type):
     c = conn.cursor()
     c.execute('SELECT * from requests where email=?;', (email,))
     requests = c.fetchall()
-    makeSelection(conn, email, requests)
+    makeSelection(conn, email, requests, type)
 
 # delete request
 def delete(conn, rid, email):
@@ -21,14 +21,14 @@ def delete(conn, rid, email):
         conn.commit()
 
 # search requests by lcode
-def searchByLcode(conn, email, lcode):
+def searchByLcode(conn, email, lcode, type):
     c = conn.cursor()
     c.execute('SELECT * from requests where pickup=?;', (lcode,))
     requests = c.fetchall()
-    makeSelection(conn, email, requests)
+    makeSelection(conn, email, requests, type)
 
 # search requests by city
-def searchByCity(conn, email, city):
+def searchByCity(conn, email, city, type):
     c = conn.cursor()
     c.execute('SELECT * from requests where pickup in (SELECT lcode from locations where city=? COLLATE NOCASE);', (city,))
     requests = c.fetchall()
@@ -41,9 +41,13 @@ def sendMessage(conn, email, receiver, content):
     conn.commit()
 
 # print the searched requests
-def makeSelection(conn, email, requests):
+def makeSelection(conn, email, requests, type):
     while True:
-        selection = displayAndSelect(requests)
+        if type == "1":
+            display(requests)
+            break
+        else:
+            selection = displayAndSelect(requests)
         # quit
         if selection is True:
             return
@@ -60,6 +64,23 @@ def makeSelection(conn, email, requests):
             if ano != "y":
                 break
             return
+
+def display(results):
+    if len(results) == 0:
+        print('no results found')
+        return ''
+    #print
+    print("request ID | request date | pickup location | dropoff location | amount")
+    for i in range(0, len(results), 5):
+        # more than 5, only print 5
+        if len(results) <= i+5:
+            for j in range(i, len(results)):
+                print(results[j])
+        # less than 5, print all
+        else:
+            for j in range(i, i+5):
+                print(results[j])
+
 
 # display the searched results and make selections to send message
 def displayAndSelect(results):
@@ -102,18 +123,18 @@ def search(conn, email):
     searchOp = input("Enter 1 to search your requests and 2 to search by location or q to go to the previous screen: ")
     # search user's requests
     if searchOp == '1':
-        userSearch(conn, email)
+        userSearch(conn, email, searchOp)
     # search by location
     elif searchOp == '2':
         isLcode = input("Enter 1 to search by lcode or 2 by city: ")
         # seach by lcode
         if isLcode == '1':
             lcode = input("Please enter the lcode: ")
-            searchByLcode(conn, email, lcode)
+            searchByLcode(conn, email, lcode, searchOp)
         # search by city
         elif isLcode == '2':
             city = input("Please enter the city: ")
-            searchByCity(conn, email, city)
+            searchByCity(conn, email, city, searchOp)
         else:
             print("Invalid input")
     # quit
