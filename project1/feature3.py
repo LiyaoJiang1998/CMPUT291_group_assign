@@ -43,11 +43,14 @@ def addBooking(conn, email):
         who = input('Please input who (email) you want to book for this ride: ')
         c.execute('''
             select email
-            from members;
-            ''')
-        allEmail = [email for subtuples in c.fetchall() for email in subtuples]
+            from members
+            where email = ? COLLATE NOCASE;
+            ''',(who,))
+        # allEmail = [email for subtuples in c.fetchall() for email in subtuples]
+        who = c.fetchone()
         # a valid email
-        if who in allEmail:
+        if who is not None:
+            who = who[0]
             break
         # invalid email
         else:
@@ -152,11 +155,14 @@ def addBooking(conn, email):
         plcode = input('Please enter the pickup location lcode: ')
         c.execute('''
             select lcode
-            from locations;
-            ''')
-        allLcode = [lcode for subtuples in c.fetchall() for lcode in subtuples]
-        # verifying the lcode valid or not
-        if plcode in allLcode:
+            from locations
+            where lcode = ? COLLATE NOCASE;
+            ''', (plcode,))
+        plcode = c.fetchone()
+        # allLcode = [lcode for subtuples in c.fetchall() for lcode in subtuples]
+        # check if the lcode is valid and exists
+        if plcode is not None:
+            plcode = plcode[0]
             break
         else:
             print('this lcode does not exist!')
@@ -171,11 +177,14 @@ def addBooking(conn, email):
         dlcode = input('Please eneter the dropoff location lcode: ')
         c.execute('''
             select lcode
-            from locations;
-            ''')
-        allLcode = [lcode for subtuples in c.fetchall() for lcode in subtuples]
-        # verifying the lcode valid or not
-        if dlcode in allLcode:
+            from locations
+            where lcode = ? COLLATE NOCASE;
+            ''', (dlcode,))
+        dlcode = c.fetchone()
+        # allLcode = [lcode for subtuples in c.fetchall() for lcode in subtuples]
+        # check if the lcode is valid and exists
+        if dlcode is not None:
+            dlcode = dlcode[0]
             break
         else:
             print('this lcode does not exist!')
@@ -240,7 +249,7 @@ def listAllRides(conn, email):
     c.execute('''
         select rno, driver, available
         from ride_info
-        where driver = ? ;
+        where driver = ? COLLATE NOCASE;
         ''', (email,))
 
     # the column names
@@ -276,7 +285,7 @@ def listAllBooking(conn, email):
     c.execute('''
         select b.bno, b.email, b.rno, b.cost, b.seats, b.pickup, b.dropoff
         from bookings b, rides r
-        where b.rno = r.rno and r.driver = ?;
+        where b.rno = r.rno and r.driver = ? COLLATE NOCASE;
         ''', (email,))
     conn.commit()
 
@@ -340,7 +349,7 @@ def cancelBooking(conn, email):
         and bookings.rno in (
             select r.rno
             from rides r
-            where r.driver = ?
+            where r.driver = ? COLLATE NOCASE
         );
         ''',(bno,email))
 
