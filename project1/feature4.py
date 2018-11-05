@@ -39,11 +39,14 @@ def feature4(conn, email):
         plcode = input('Please enter the pickup location lcode: ')
         c.execute('''
             select lcode
-            from locations;
-            ''')
-        allLcode = [lcode for subtuples in c.fetchall() for lcode in subtuples]
+            from locations
+            where lcode = ? COLLATE NOCASE;
+            ''', (plcode,))
+        plcode = c.fetchone()
+        # allLcode = [lcode for subtuples in c.fetchall() for lcode in subtuples]
         # check if the lcode is valid and exists
-        if plcode in allLcode:
+        if plcode is not None:
+            plcode = plcode[0]
             break
         else:
             print('this lcode does not exist!')
@@ -58,11 +61,14 @@ def feature4(conn, email):
         dlcode = input('Please eneter the dropoff location lcode: ')
         c.execute('''
             select lcode
-            from locations;
-            ''')
-        allLcode = [lcode for subtuples in c.fetchall() for lcode in subtuples]
+            from locations
+            where lcode = ? COLLATE NOCASE;
+            ''', (dlcode,))
+        dlcode = c.fetchone()
+        # allLcode = [lcode for subtuples in c.fetchall() for lcode in subtuples]
         # check if the lcode is valid and exists
-        if dlcode in allLcode:
+        if dlcode is not None:
+            dlcode = dlcode[0]
             break
         else:
             print('this lcode does not exist!')
