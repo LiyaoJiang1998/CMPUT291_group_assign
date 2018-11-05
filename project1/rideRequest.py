@@ -32,7 +32,7 @@ def searchByCity(conn, email, city, type):
     c = conn.cursor()
     c.execute('SELECT * from requests where pickup in (SELECT lcode from locations where city=? COLLATE NOCASE);', (city,))
     requests = c.fetchall()
-    makeSelection(conn, email, requests)
+    makeSelection(conn, email, requests, type)
 
 # send message to user who posted requests
 def sendMessage(conn, email, receiver, content):
