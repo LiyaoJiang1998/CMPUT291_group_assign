@@ -26,8 +26,15 @@ def addBooking(conn, email):
             else:
                 return
         else:
+            c.execute('''
+                select driver
+                from rides
+                where rno = ? and driver = ? COLLATE NOCASE;
+                ''', (rno, email))
+            driver = c.fetchone()
             # the user provided this ride
-            if driver[0] == email:
+            if driver is not None:
+                driver = driver[0]
                 break
             # the user did not provide this ride
             else:
@@ -327,11 +334,13 @@ def cancelBooking(conn, email):
             c.execute('''
                 select r.driver, r.rno
                 from bookings b, rides r
-                where b.bno = ? and b.rno = r.rno;
-                ''',(bno,))
-            (provider,ridenum) = c.fetchone()
+                where b.bno = ? and b.rno = r.rno
+                and r.driver = ? COLLATE NOCASE;
+                ''',(bno,email))
+            foundtu = c.fetchone()
             # validate the provider
-            if provider == email:
+            if foundtu is not None:
+                (provider, ridenum) = foundtu
                 break
             else:
                 print('you did not provide this ride!')
