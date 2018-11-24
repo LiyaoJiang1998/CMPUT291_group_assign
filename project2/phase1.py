@@ -1,17 +1,29 @@
 import re
+import time
 
 #out put file locations
 terms = './outputs/terms.txt'
 pdates = './outputs/pdates.txt'
 prices = './outputs/prices.txt'
 ads = './outputs/ads.txt'
+data = './1k.txt'
 
+def processPrice(price, aid, cat, loc, prf):
+    prf.write('{:>12}'.format(price) + ':' + aid + ',' + cat + ',' + loc + '\n')
 
-def processPdate(date, aid, cat, loc):
-    global pdates
-    f = open(pdates, 'a')
-    f.write(date + ':' + aid + ',' + cat + ',' + loc + '\n')
-    f.close()
+'''
+A function used to write prices to file in the desired format
+
+inputs:
+    date: date of ad
+    aid: id of ad
+    cat: categorty of ad
+    loc: location of ad
+    pdf: file to append info to
+'''
+def processPdate(date, aid, cat, loc, pdf):
+    pdf.write(date + ':' + aid + ',' + cat + ',' + loc + '\n')
+    
 
 '''
 A function used to take a input string and aid and write to terms.txt
@@ -19,9 +31,9 @@ A function used to take a input string and aid and write to terms.txt
 inputs:
     info: a string
     aid: the id of the ad
+    tf: file to append terms to
 '''
-def processTerms(info, aid):
-    global terms
+def processTerms(info, aid, tf):
     #remove special chars
     specialCharList = re.findall('\&\#[0-9]+;', info)
     for c in specialCharList:
@@ -31,15 +43,20 @@ def processTerms(info, aid):
     info = info.replace('&amp;', '&')
     
     termList = re.findall('[0-9a-z\_\-]{3,}',info)
-    f = open(terms, 'a')
     for t in termList:
-        f.write(t+':'+aid+'\n')
-    f.close()
+        tf.write(t+':'+aid+'\n')
 
 '''
 A function used to take information from the xml line and output to 4 files
+
+inputs:
+    line: a line read from the data file
+    tf: file to append terms to
+    pdf: file to append pdates to
+    prf: file to append prices to
+    adf: file to append ads to
 '''
-def process(line):
+def process(line, tf, pdf, prf, adf):
     m = re.search('<aid>[0-9]+<\/aid>', line)
     #get aid
     aid = m.group(0).replace('<aid>','').replace('</aid>','')
@@ -53,9 +70,8 @@ def process(line):
     desc = m.group(0).replace('<desc>','').replace('/desc>','').lower()
 
     #output to terms.txt
-    processTerms(title, aid)
-    processTerms(desc,aid)
-
+    processTerms(title, aid, tf)
+    processTerms(desc,aid, tf)
     
     #get date
     m = re.search('<date>.*</date>', line)
@@ -70,7 +86,14 @@ def process(line):
     location = m.group(0).replace('<loc>','').replace('</loc>','')
 
     #output to pdate.txt
-    processPdate(date, aid, category, location)
+    processPdate(date, aid, category, location, pdf)
+
+    #get price
+    m = re.search('<price>.*</price>', line)
+    price = m.group(0).replace('<price>', '').replace('</price>','')
+
+    #output to prices.txt
+    processPrice(price, aid, category, location, prf)
     
     
 '''
@@ -88,17 +111,27 @@ def clearOutputs():
     temp.close()
 
 def main():
-    info = open("./1k.txt", "r")
+    global data, terms, pdates, prices, ads 
+    info = open(data, "r")
     line = info.readline()
 
     clearOutputs()
-
+    tf = open(terms, 'a')
+    pdf = open(pdates, 'a')
+    prf = open(prices, 'a')
+    adf = open(ads, 'a')
     while line is not '':
         #print(line)
         if re.match('<ad>.+<\/ad>', line):
-            process(line)
-        
+            process(line, tf, pdf, prf, adf)
         line = info.readline()
+    tf.close()
+    pdf.close()
+    prf.close()
+    adf.close()
+    info.close()
 
 if __name__ == "__main__":
+    start_time = time.time()
     main()
+    print("--- %s seconds ---" % (time.time() - start_time))
