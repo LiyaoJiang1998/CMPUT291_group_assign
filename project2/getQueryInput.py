@@ -38,7 +38,7 @@ def getQueryInput():
     
     #get all the terms
     # terms = re.findall('(?:^| )[^ <>=]+(?:$| )', query)
-    terms = re.findall('[a-zA-Z\_\-]+%', query)
+    terms = re.findall('[a-zA-Z\_\-]+%?', query)
     for i in range(0, len(terms)):
         terms[i] = terms[i].lower()
     
