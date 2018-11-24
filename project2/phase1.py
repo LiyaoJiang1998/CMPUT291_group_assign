@@ -26,6 +26,9 @@ def processTerms(info, aid):
     specialCharList = re.findall('\&\#[0-9]+;', info)
     for c in specialCharList:
         info = info.replace(c, '')
+    info = info.replace('&apos;', '\'')
+    info = info.replace('&quot;', '\"')
+    info = info.replace('&amp;', '&')
     
     termList = re.findall('[0-9a-z\_\-]{3,}',info)
     f = open(terms, 'a')
@@ -53,6 +56,7 @@ def process(line):
     processTerms(title, aid)
     processTerms(desc,aid)
 
+    
     #get date
     m = re.search('<date>.*</date>', line)
     date = m.group(0).replace('<date>','').replace('</date>','').lower()
@@ -67,6 +71,7 @@ def process(line):
 
     #output to pdate.txt
     processPdate(date, aid, category, location)
+    
     
 '''
 A function used to clear existing output txt files
@@ -83,7 +88,7 @@ def clearOutputs():
     temp.close()
 
 def main():
-    info = open("./10.txt", "r")
+    info = open("./1k.txt", "r")
     line = info.readline()
 
     clearOutputs()
