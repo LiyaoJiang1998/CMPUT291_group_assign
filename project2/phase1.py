@@ -6,7 +6,7 @@ terms = './outputs/terms.txt'
 pdates = './outputs/pdates.txt'
 prices = './outputs/prices.txt'
 ads = './outputs/ads.txt'
-data = './1k.txt'
+data = './10.txt'
 
 def processPrice(price, aid, cat, loc, prf):
     prf.write('{:>12}'.format(price) + ':' + aid + ',' + cat + ',' + loc + '\n')
