@@ -6,7 +6,7 @@ terms = './outputs/terms.txt'
 pdates = './outputs/pdates.txt'
 prices = './outputs/prices.txt'
 ads = './outputs/ads.txt'
-data = './1k.txt'
+data = './10.txt'
 
 '''
 a function used to write ads to ads.txt in the desired format
@@ -32,7 +32,7 @@ inputs:
 '''
 def processPdate(date, aid, cat, loc, pdf):
     pdf.write(date + ':' + aid + ',' + cat + ',' + loc + '\n')
-    
+
 
 '''
 A function used write to terms.txt
@@ -50,7 +50,7 @@ def processTerms(info, aid, tf):
     info = info.replace('&apos;', '\'')
     info = info.replace('&quot;', '\"')
     info = info.replace('&amp;', '&')
-    
+
     termList = re.findall('[0-9a-z\_\-]{3,}',info)
     for t in termList:
         tf.write(t+':'+aid+'\n')
@@ -81,7 +81,7 @@ def process(line, tf, pdf, prf, adf):
     #output to terms.txt
     processTerms(title, aid, tf)
     processTerms(desc,aid, tf)
-    
+
     #get date
     m = re.search('<date>.*</date>', line)
     date = m.group(0).replace('<date>','').replace('</date>','').lower()
@@ -106,8 +106,8 @@ def process(line, tf, pdf, prf, adf):
 
     #output to ads.txt
     processAds(aid, line, adf)
-    
-    
+
+
 '''
 A function used to clear existing output txt files
 '''
@@ -123,7 +123,7 @@ def clearOutputs():
     temp.close()
 
 def main():
-    global data, terms, pdates, prices, ads 
+    global data, terms, pdates, prices, ads
     info = open(data, "r")
     line = info.readline()
 
