@@ -6,13 +6,22 @@ terms = './outputs/terms.txt'
 pdates = './outputs/pdates.txt'
 prices = './outputs/prices.txt'
 ads = './outputs/ads.txt'
-data = './10.txt'
+data = './1k.txt'
 
+'''
+a function used to write ads to ads.txt in the desired format
+'''
+def processAds(aid, line, adf):
+    adf.write(aid + ':' + line)
+
+'''
+a function used to write prices to prices.txt in the desired format
+'''
 def processPrice(price, aid, cat, loc, prf):
     prf.write('{:>12}'.format(price) + ':' + aid + ',' + cat + ',' + loc + '\n')
 
 '''
-A function used to write prices to file in the desired format
+A function used to write pdates to pdates.txt in the desired format
 
 inputs:
     date: date of ad
@@ -26,7 +35,7 @@ def processPdate(date, aid, cat, loc, pdf):
     
 
 '''
-A function used to take a input string and aid and write to terms.txt
+A function used write to terms.txt
 
 inputs:
     info: a string
@@ -94,6 +103,9 @@ def process(line, tf, pdf, prf, adf):
 
     #output to prices.txt
     processPrice(price, aid, category, location, prf)
+
+    #output to ads.txt
+    processAds(aid, line, adf)
     
     
 '''
