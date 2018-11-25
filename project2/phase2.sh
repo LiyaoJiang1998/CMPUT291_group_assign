@@ -3,7 +3,7 @@
 # remove old txt files if exists
 rm -f ./outputs/*.txt
 # parse
-python3 phase1.py
+python3 phase1.py $1
 # remove old index files if exists
 rm -f ./outputs/*.idx
 # sort the .txt files, break the input, use given script break.pl to build .idx

@@ -1,12 +1,14 @@
 import re
 import time
+import sys
 
 #out put file locations
 terms = './outputs/terms.txt'
 pdates = './outputs/pdates.txt'
 prices = './outputs/prices.txt'
 ads = './outputs/ads.txt'
-data = './10.txt'
+# data = './10.txt'
+data = sys.argv[1]
 
 '''
 a function used to write ads to ads.txt in the desired format
