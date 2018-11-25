@@ -72,7 +72,7 @@ def getQueryInput():
                 continue
             #get all the terms
             # terms = re.findall('(?:^| )[^ <>=]+(?:$| )', query)
-            terms = re.findall('[a-zA-Z\_\-]+%?', query)
+            terms = re.findall('[a-zA-Z0-9\_\-]+%?', query)
             for term in terms:
                 if re.match('^(?!.*%).*$', term):
                     exact_terms.append(term)
