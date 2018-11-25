@@ -77,7 +77,7 @@ def getQueryInput():
                 if re.match('^(?!.*%).*$', term):
                     exact_terms.append(term)
                 else:
-                    partial_terms.append(term)
+                    partial_terms.append(term.replace('%',''))
 
             for date in date_conditional:
                 # print('date')
