@@ -1,4 +1,5 @@
 from bsddb3 import db
+import re
 
 
 def exaTermQuery(term):
@@ -41,9 +42,8 @@ def infoQuery(info, aids):
         else:
             name = info[0]
         result = database.get(aid)
-        result = result[1].decode("utf-8")
-        m = re.search('<{0}>.+<\/{0}>'.format(name), result)
-        value = m.group(0).replace('<{0}>'.format(name),'').replace('/{0}>'.format(name),'').lower()
+        m = re.search('<{0}>.+<\/{0}>'.format(name), result.decode("utf-8"))
+        value = m.group(0).replace('<{0}>'.format(name),'').replace('</{0}>'.format(name),'').lower()
         if info[2] == value:
             resultId.append(aid)
     database.close()
