@@ -1,5 +1,21 @@
 import re
 import time
+from nonkeySearch import *
+from queryEval import *
+
+def intersectResults(queryResults):
+    '''
+    takes input of a list of list of aids found by each conditionals
+    eg.             [[b'1003735318', b'1003735660', b'1002787981'],
+                    [b'1003735318', b'1269098382', b'1001612872'],
+                    [b'1003735318', b'1370676359', b'1396178670']]
+    '''
+    if not queryResults:
+        return list()
+    finalResults = set(queryResults[0])
+    for s in queryResults:
+        finalResults.intersection_update(s)
+    return list(finalResults)
 
 '''
 Get a query from user
@@ -12,17 +28,16 @@ Returns:
     terms: a list of terms
 '''
 def getQueryInput():
-    #conditionals = list()
-    terms = list()
-    exact_terms = list()
-    partial_terms = list()
-    price_conditional = list()
-    date_conditional = list()
-    nonkey_conditional = list()
-
     confirm = False
     full = True
     while not confirm:
+        terms = list()
+        exact_terms = list()
+        partial_terms = list()
+        price_conditional = list()
+        date_conditional = list()
+        nonkey_conditional = list()
+        aids = []
         query = input('Please enter query: ')
         if query == "output=brief":
             full = False
@@ -36,6 +51,7 @@ def getQueryInput():
         c = input('confirm? \'y\' to proceed, \'q\' to quit, anything else to retry: ')
         if c == 'y':
             #get all the conditional statements
+            invalid = False
             conditionals = re.findall('[^ ]+[ ]*(?:=|>=|<=|<|>)[ ]*[^ ]+', query)
             for i in range(0,len(conditionals)):
                 query = query.replace(conditionals[i], '')
@@ -47,11 +63,13 @@ def getQueryInput():
                 elif tup[0] == 'price':
                     price_conditional.append(tup)
                 else:
-                    if tup[0] != "location" or tup[0] != "cat":
+                    if tup[0] != "location" and tup[0] != "cat":
                         print("Invalid input, please try again")
-                        continue
+                        invalid = True
+                        break
                     nonkey_conditional.append(tup)
-
+            if invalid:
+                continue
             #get all the terms
             # terms = re.findall('(?:^| )[^ <>=]+(?:$| )', query)
             terms = re.findall('[a-zA-Z\_\-]+%?', query)
@@ -60,34 +78,39 @@ def getQueryInput():
                     exact_terms.append(term)
                 else:
                     partial_terms.append(term)
-        aids = []
-        for date in date_conditional:
-            aids.append(evalDate(date[1], date[2]))
-        for price in price_conditional:
-            aids.append(evalPrice(price[1], price[2]))
-        for exact_term in exact_terms:
-            aids.append(exaTermQuery(exact_term))
-        for partial_term in partial_terms:
-            aids.append(nonExaTermQuery(partial_term))
-        if aids:
-            ids = intersectResults(aids)
-            for nonkey in nonkey_conditional:
-                ids = infoQuery(nonkey, ids)
-        else:
-            if nonkey_conditional:
-                ids = getAllAids()
+
+            for date in date_conditional:
+                # print('date')
+                aids.append(evalDate(date[1], date[2]))
+            for price in price_conditional:
+                # print('price')
+                aids.append(evalPrice(price[1], price[2]))
+            for exact_term in exact_terms:
+                # print('eterm')
+                aids.append(exaTermQuery(exact_term))
+            for partial_term in partial_terms:
+                # print("pterm")
+                aids.append(nonExaTermQuery(partial_term))
+            if aids:
+                ids = intersectResults(aids)
                 for nonkey in nonkey_conditional:
                     ids = infoQuery(nonkey, ids)
-        if full:
-            print(getRecords(ids))
-        else:
-            records = getRecords(ids)
-            for record in records:
-                m = re.search('<ti>.+<\/ti>', records)
-                value = m.group(0).replace('<ti>'.,'').replace('/{ti}>','')
-                print(record[0] + value)
-
-
+            else:
+                if nonkey_conditional:
+                    ids = getAllAids()
+                    for nonkey in nonkey_conditional:
+                        ids = infoQuery(nonkey, ids)
+            if full:
+                # print(ids)
+                results = getRecords(ids)
+                for i in results:
+                    print(i)
+            else:
+                records = getRecords(ids)
+                for record in records:
+                    m = re.search('<ti>.+<\/ti>', record[1])
+                    value = m.group(0).replace('<ti>','').replace('/{ti}>','')
+                    print(record[0] + " " + value)
 
         if c == 'q':
             return
@@ -98,12 +121,7 @@ def getQueryInput():
 
 
 def main():
-    price_conditional, date_conditional, nonkey_conditional, exact_terms, partial_terms = getQueryInput()
-    print(price_conditional)
-    print(date_conditional)
-    print(nonkey_conditional)
-    print(exact_terms)
-    print(partial_terms)
+    getQueryInput()
 
 if __name__ == "__main__":
     # start_time = time.time()
