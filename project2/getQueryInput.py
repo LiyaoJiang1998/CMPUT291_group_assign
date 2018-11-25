@@ -11,8 +11,10 @@ Returns:
     terms: a list of terms
 '''
 def getQueryInput():
-    conditionals = list()
+    #conditionals = list()
     terms = list()
+    key_conditional = list()
+    nonkey_conditional = list()
 
     confirm = False
     while not confirm:
@@ -23,7 +25,7 @@ def getQueryInput():
         if c == 'y':
             break 
         if c == 'q':
-            return conditionals, terms
+            return key_conditional, nonkey_conditional, terms
     
     #time
     #start_time = time.time()
@@ -34,7 +36,11 @@ def getQueryInput():
         query = query.replace(conditionals[i], '')
         temp = conditionals[i].replace(' ', '')
         m = re.search('(?:=|>=|<=|>|<)', temp)
-        conditionals[i] = (temp[0:m.start()], temp[m.start():m.end()], temp[m.end():])
+        tup = (temp[0:m.start()], temp[m.start():m.end()], temp[m.end():])
+        if tup[0] == 'date' or tup[0] == 'price':
+            key_conditional.append(tup)
+        else:
+            nonkey_conditional.append(tup)
     
     #get all the terms
     # terms = re.findall('(?:^| )[^ <>=]+(?:$| )', query)
@@ -44,11 +50,12 @@ def getQueryInput():
     
     #end time
     #print("--- %s seconds ---" % (time.time() - start_time))
-    return conditionals, terms
+    return key_conditional, nonkey_conditional, terms
     
 def main():
-    conditionals, terms = getQueryInput()
-    print(conditionals)
+    key_conditional, nonkey_conditional, terms = getQueryInput()
+    print(key_conditional)
+    print(nonkey_conditional)
     print(terms)
 
 if __name__ == "__main__":
