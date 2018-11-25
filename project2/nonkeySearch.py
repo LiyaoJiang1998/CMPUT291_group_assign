@@ -7,17 +7,13 @@ def exaTermQuery(term):
     curs = database.cursor()
     aids = []
     aid = curs.set(term.lower().encode("utf-8"))
-    if (aid is None):
-        curs.close()
-        database.close()
-        return None
-    else:
-        while(aid != None):
-            aids.append(aid[1])
-            aid = curs.next_dup()
-        curs.close()
-        database.close()
-        return aids
+
+    while(aid != None):
+        aids.append(aid[1])
+        aid = curs.next_dup()
+    curs.close()
+    database.close()
+    return aids
 
 def nonExaTermQuery(term):
     database = db.DB()
@@ -25,19 +21,15 @@ def nonExaTermQuery(term):
     curs = database.cursor()
     aids = []
     aid = curs.set_range(term.lower().encode("utf-8"))
-    if aid is None:
-        curs.close()
-        database.close()
-        return None
-    else:
-        while (aid is not None):
-            if(str(aid[0].decode("utf-8")[0:len(term)]) > term):
-                break
-            aids.append(aid[1])
-            aid = curs.next()
-        curs.close()
-        database.close()
-        return aids
+
+    while (aid is not None):
+        if(str(aid[0].decode("utf-8")[0:len(term)]) > term):
+            break
+        aids.append(aid[1])
+        aid = curs.next()
+    curs.close()
+    database.close()
+    return aids
 
 def infoQuery(info, aids):
     resultId = []
@@ -55,10 +47,7 @@ def infoQuery(info, aids):
         if info[2] == value:
             resultId.append(aid)
     database.close()
-    if resultId:
-        return None
-    else:
-        return resultId
+    return resultId
 
 def getAllAids():
     database = db.DB()
@@ -77,11 +66,8 @@ def getRecords(aids):
     curs = database.cursor()
     records = []
     for aid in aids:
-        records.append(curs.set(aid).decode("utf-8"))
-    if records:
-        curs.close()
-        database.close()
-        return None
+        records.append((curs.set(aid)[0].decode("utf-8"), curs.set(aid)[1].decode("utf-8")))
+
     curs.close()
     database.close()
     return records
