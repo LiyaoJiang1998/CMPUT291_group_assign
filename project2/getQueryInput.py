@@ -7,7 +7,8 @@ Get a query from user
 Inputs: none
 
 Returns:
-    conditionals: a list of tuples, tuple in format (left, operator, right)
+    key_conditional: a list of tuples for keys, tuple in format (left, operator, right)
+    nonkey_conditional: a list of tuples for nonkeys, tuple in format (left, operator, right)
     terms: a list of terms
 '''
 def getQueryInput():
