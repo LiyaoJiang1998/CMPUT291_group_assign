@@ -51,9 +51,10 @@ def processTerms(info, aid, tf):
     specialCharList = re.findall('\&\#[0-9]+;', info)
     for c in specialCharList:
         info = info.replace(c, '')
+    info = info.replace('&amp;', '&')
     info = info.replace('&apos;', '\'')
     info = info.replace('&quot;', '\"')
-    info = info.replace('&amp;', '&')
+    
 
     termList = re.findall('[0-9a-z\_\-]{3,}',info)
     for t in termList:
