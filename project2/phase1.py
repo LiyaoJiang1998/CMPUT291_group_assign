@@ -33,6 +33,8 @@ inputs:
     pdf: file to append info to
 '''
 def processPdate(date, aid, cat, loc, pdf):
+    if date == '':
+        return
     pdf.write(date + ':' + aid + ',' + cat + ',' + loc + '\n')
 
 
@@ -71,13 +73,13 @@ def process(line, tf, pdf, prf, adf):
     m = re.search('<aid>[0-9]+<\/aid>', line)
     #get aid
     aid = m.group(0).replace('<aid>','').replace('</aid>','')
-    m = re.search('<ti>.+<\/ti>', line)
+    m = re.search('<ti>.*<\/ti>', line)
 
     #get title
     title = m.group(0).replace('<ti>','').replace('/ti>','').lower()
 
     #get desc
-    m = re.search('<desc>.+</desc>', line)
+    m = re.search('<desc>.*</desc>', line)
     desc = m.group(0).replace('<desc>','').replace('/desc>','').lower()
 
     #output to terms.txt
