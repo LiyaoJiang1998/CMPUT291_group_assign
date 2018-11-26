@@ -118,7 +118,7 @@ def getQueryInput():
             else:
                 records = getRecords(ids)
                 for record in records:
-                    m = re.search('<ti>.+<\/ti>', record[1])
+                    m = re.search('<ti>.*<\/ti>', record[1])
                     value = m.group(0).replace('<ti>','').replace('/{ti}>','')
                     print(record[0] + " " + value)
 
