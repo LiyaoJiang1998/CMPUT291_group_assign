@@ -38,6 +38,7 @@ def getQueryInput():
         date_conditional = list()
         nonkey_conditional = list()
         aids = []
+        ids = []
         query = input('Please enter query: ')
         if query == "output=brief":
             full = False
@@ -62,6 +63,15 @@ def getQueryInput():
                     date_conditional.append(tup)
                 elif tup[0] == 'price':
                     price_conditional.append(tup)
+                elif tup[0] == "output" and tup[1] == "=":
+                    if tup[2] == "brief":
+                        full = False
+                    elif tup[2] == "full":
+                        full = True
+                    else:
+                        print("Invalid input, please try again")
+                        invalid = True
+                        break
                 else:
                     if tup[0] != "location" and tup[0] != "cat":
                         print("Invalid input, please try again")
